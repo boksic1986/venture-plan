@@ -40,7 +40,7 @@ end
 local MissionPage, MissionList
 
 local startedMissions, finishedMissions, FlagMissionFinish, GetReservedAnima = {}, {} do
-	local followerLock, costLock, lockedCosts = {}, {}, 0
+	local followerLock, followerLockMission, costLock, lockedCosts = {}, {}, {}, 0
 	hooksecurefunc(C_Garrison, "StartMission", function(mid)
 		if not mid or C_Garrison.GetFollowerTypeByMissionID(mid) ~= 123 then return end
 		startedMissions[mid] = 1
@@ -53,10 +53,13 @@ local startedMissions, finishedMissions, FlagMissionFinish, GetReservedAnima = {
 		end
 		lockedCosts, costLock[mid] = lockedCosts - (costLock[mid] or 0) + (mi and mi.cost or 0), mi and mi.cost or nil
 	end)
-	function EV:ADVENTURE_MAP_CLOSE()
+	function EV:GARRISON_MISSION_NPC_CLOSED(ft)
+		if ft ~= 123 then
+			return
+		end
 		startedMissions = {}
 		finishedMissions = {}
-		followerLock = {}
+		followerLock, followerLockMission = {}, {}
 		costLock, lockedCosts = {}, 0
 		if MissionList then
 			S[MissionList]:ReturnToTop()
@@ -69,6 +72,11 @@ local startedMissions, finishedMissions, FlagMissionFinish, GetReservedAnima = {
 		if costLock[mid] then
 			lockedCosts, costLock[mid] = lockedCosts - costLock[mid], nil
 		end
+		for k, v in pairs(followerLockMission) do
+			if v == mid then
+				followerLockMission[k], followerLock[k] = nil
+			end
+		end
 	end
 	function EV:I_MARK_FALSESTART_FOLLOWERS(fa)
 		for i=1,fa and #fa or 0 do
@@ -78,6 +86,11 @@ local startedMissions, finishedMissions, FlagMissionFinish, GetReservedAnima = {
 				fi.status = GARRISON_FOLLOWER_ON_MISSION
 				fi.missionTimeEnd = et
 			end
+		end
+	end
+	function EV:I_RELEASE_FALSESTART_FOLLOWERS()
+		for k in pairs(followerLock) do
+			followerLock[k], followerLockMission[k] = nil
 		end
 	end
 	function FlagMissionFinish(mid)

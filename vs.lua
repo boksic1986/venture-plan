@@ -668,34 +668,6 @@ function mu:die(sourceIndex, deadIndex, causeTag, eDNE)
 			mu[q[1]](self, unpack(q,2))
 		end
 	end
-	local turn, dside, masks, horizon = self.turn, deadIndex < 5
-	for k,v in pairs(self.queue) do
-		if k > turn then
-			local fim, fom, dtm = 0,0,0
-			for i=1,#v do
-				local vi = v[i]
-				if vi[2] == deadIndex then
-					local mt, tar, ex = vi[1], vi[3], vi[4]
-					local tside = tar < 5
-					if tside == dside and (mt == "unstackf32" and ex == "modDamageDealt" or mt == "statDelta" and ex == "plusDamageDealt") then
-						fom = bor(fom, 2^tar)
-					elseif tside ~= dside and (mt == "unstackf32" and ex == "modDamageTaken" or mt == "statDelta" and ex == "plusDamageTaken") then
-						fim = bor(fim, 2^tar)
-					elseif (mt == "damage" or mt == "dtick") then
-						dtm = bor(dtm, 2^tar)
-					end
-				end
-			end
-			if fim > 0 or fom > 0 or dtm > 0 then
-				masks = masks or {}
-				masks[3*k] = fim > 0 and fim or nil
-				masks[3*k+1] = fom > 0 and fom or nil
-				masks[3*k+2] = dtm > 0 and dtm or nil
-				horizon = horizon and horizon > k and horizon or k
-			end
-		end
-	end
-	du.dmasks, du.dhorizon, du.drA, du.drB, du.drC = masks, horizon, 0, 0, 0
 end
 function mu:passive(source, sid)
 	local board = self.board
@@ -968,6 +940,36 @@ local function resolveDeath(board, a, b, inOrder)
 		end
 	end
 end
+local function prepareDeath(self, turn, du, deadIndex)
+	local dside, masks, horizon = deadIndex < 5
+	for k,v in pairs(self.queue) do
+		if k >= turn then
+			local fim, fom, dtm = 0,0,0
+			for i=1,#v do
+				local vi = v[i]
+				if vi[2] == deadIndex then
+					local mt, tar, ex = vi[1], vi[3], vi[4]
+					local tside = tar < 5
+					if tside == dside and (mt == "unstackf32" and ex == "modDamageDealt" or mt == "statDelta" and ex == "plusDamageDealt") then
+						fom = bor(fom, 2^tar)
+					elseif tside ~= dside and (mt == "unstackf32" and ex == "modDamageTaken" or mt == "statDelta" and ex == "plusDamageTaken") then
+						fim = bor(fim, 2^tar)
+					elseif (mt == "damage" or mt == "dtick") then
+						dtm = bor(dtm, 2^tar)
+					end
+				end
+			end
+			if fim > 0 or fom > 0 or dtm > 0 then
+				masks = masks or {}
+				masks[3*k] = fim > 0 and fim or nil
+				masks[3*k+1] = fom > 0 and fom or nil
+				masks[3*k+2] = dtm > 0 and dtm or nil
+				horizon = horizon and horizon > k and horizon or k
+			end
+		end
+	end
+	du.dmasks, du.dhorizon, du.drA, du.drB, du.drC = masks, horizon, 0, 0, 0
+end
 local function prepareTurn(self)
 	local board, turn = self.board, self.turn
 	
@@ -976,6 +978,8 @@ local function prepareTurn(self)
 		local e = board[b]
 		if e and e.curHP > 0 then
 			mlive = mlive + 2^b
+		elseif e and not e.drA then
+			prepareDeath(self, turn, e, b)
 		end
 	end
 

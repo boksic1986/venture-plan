@@ -322,6 +322,7 @@ do -- startQueue
 	end
 	function U.StopStartingMissions()
 		startQueue, startQueueLength = {}, 0
+		EV("I_RELEASE_FALSESTART_FOLLOWERS")
 	end
 	function U.IsMissionInStartQueue(mid)
 		return startQueue[mid] ~= nil
@@ -388,6 +389,15 @@ do -- delayStart
 		if changed then
 			if next(delayedStart) == nil then
 				delayTime = nil
+			end
+			EV("I_DELAYED_START_UPDATE")
+		end
+	end
+	function EV:GARRISON_MISSION_NPC_CLOSED(mt)
+		if mt == 123 and delayTime then
+			delayTime = nil
+			for k in pairs(delayedStart) do
+				delayedStart[k] = nil
 			end
 			EV("I_DELAYED_START_UPDATE")
 		end
