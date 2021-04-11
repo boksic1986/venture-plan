@@ -180,16 +180,16 @@ do -- Tentative Groups
 	end
 	function U.StoreMissionGroup(mid, gt, disbandGroups)
 		if gt and next(gt) ~= nil then
-			for _, v in pairs(gt) do
+			local gn = {}
+			for k, v in pairs(gt) do
 				U.ReleaseTentativeFollower(v, disbandGroups, true)
-			end
-			groups[mid] = gt
-			for _, v in pairs(gt) do
+				gn[k] = v
 				if not autoTroops[v] then
 					followerMissionID[v] = mid
 					healthyCompanions[v] = nil
 				end
 			end
+			groups[mid] = gn
 			EV("I_TENTATIVE_GROUPS_CHANGED")
 		elseif gt == nil and groups[mid] then
 			for _, v in pairs(groups[mid]) do
@@ -322,7 +322,6 @@ do -- startQueue
 	end
 	function U.StopStartingMissions()
 		startQueue, startQueueLength = {}, 0
-		EV("I_RELEASE_FALSESTART_FOLLOWERS")
 	end
 	function U.IsMissionInStartQueue(mid)
 		return startQueue[mid] ~= nil
@@ -345,7 +344,8 @@ do -- startQueue
 end
 do -- delayStart
 	local delayedStart, delayTime = {}, nil
-	local function tick()
+	local stickHandle, stickLast, stickNext
+	local function checkStart()
 		local now = GetTime()
 		if delayTime and now >= delayTime then
 			delayTime = nil
@@ -355,29 +355,72 @@ do -- delayStart
 			end
 			EV("I_DELAYED_START_UPDATE")
 		elseif delayTime then
-			C_Timer.After(math.max(0.005,delayTime-now), tick)
+			C_Timer.After(math.max(0.005,delayTime-now), checkStart)
 		end
+	end
+	local function tick()
+		if not (delayTime and stickNext) then
+			return
+		end
+		local now = GetTime()
+		if stickNext > now then
+			C_Timer.After(math.max(0.005, stickNext-now), tick)
+		else
+			stickHandle, stickLast = nil
+			local wp, h = PlaySound(158565)
+			if wp then
+				stickHandle, stickLast = h, now
+			end
+			stickNext = nil
+		end
+	end
+	local function cancelTicking()
+		if stickHandle and stickLast and GetTime()-stickLast < 1 then
+			StopSound(stickHandle)
+			stickHandle, stickNext = nil
+		end
+	end
+	local function startTicking(now)
+		cancelTicking()
+		stickNext = now
+		tick()
+		stickNext = now+1
+		C_Timer.After(1.01, tick)
 	end
 	function U.HasDelayedStartMissions()
 		return not not delayTime
 	end
 	function U.ClearDelayedStartMissions()
 		wipe(delayedStart)
+		cancelTicking()
 		delayTime = nil
 		EV("I_DELAYED_START_UPDATE")
 	end
 	function U.StartMissionWithDelay(mid, g)
-		U.StoreMissionGroup(mid, g, true)
-		delayedStart[mid], delayTime = true, GetTime()+1.5
-		EV("I_DELAYED_START_UPDATE")
-		C_Timer.After(1.5, tick)
+		local mi, now = C_Garrison.GetBasicMissionInfo(mid), GetTime()
+		if mi then
+			U.StoreMissionGroup(mid, g, true)
+			if mi.offerEndTime and (mi.offerEndTime-now) <= 4 then
+				U.SendTentativeGroup(mid)
+			else
+				delayedStart[mid], delayTime = true, now+2
+				C_Timer.After(2.01, checkStart)
+				startTicking(now)
+				EV("I_DELAYED_START_UPDATE")
+				return true
+			end
+		end
 	end
 	function U.ClearDelayedStartMission(mid)
 		delayedStart[mid] = nil
 		if next(delayedStart) == nil then
 			delayTime = nil
+			cancelTicking()
 		end
 		EV("I_DELAYED_START_UPDATE")
+	end
+	function U.IsMissionStartingSoon(mid)
+		return not not delayedStart[mid]
 	end
 	function EV:I_TENTATIVE_GROUPS_CHANGED()
 		local changed = false
@@ -393,8 +436,8 @@ do -- delayStart
 			EV("I_DELAYED_START_UPDATE")
 		end
 	end
-	function EV:GARRISON_MISSION_NPC_CLOSED(mt)
-		if mt == 123 and delayTime then
+	function EV:GARRISON_MISSION_NPC_CLOSED()
+		if delayTime then
 			delayTime = nil
 			for k in pairs(delayedStart) do
 				delayedStart[k] = nil

@@ -141,8 +141,8 @@ local TP = {} do
 		},
 		[3]={
 			[0]="23104", "03421", "03214", "20143", "31204",
-			"56a79b8c", "5a7b69c8", "65bac798", "768a9bc5",
-			"56a79b8c", "96b57a8c", "a78c69b5", "56a79b8c"
+			"56a79b8c", "5a7b69c8", "6bac8759", "768bc95a",
+			"5a6978bc", "96b57a8c", "a78c69b5", "56a79b8c"
 		},
 		[4]={
 			[0]="0", "1", "2", "3", "4",
@@ -265,8 +265,8 @@ local TP = {} do
 				if tu and tu.curHP > 0 and not tu.shroud then
 					stt[1], ni, ot = 0, 2
 				else
-					local t1, t2 = board[1], board[2]
-					if not (t1 and t1.curHP > 0 and not t1.shroud) and (t2 and t2.curHP > 0 and not t2.shroud) then
+					local t2 = board[2]
+					if t2 and t2.curHP > 0 and not t2.shroud then
 						stt[1], ni, ot = 2, 2
 						for i=5,6 do
 							tu = board[i]

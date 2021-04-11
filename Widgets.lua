@@ -659,7 +659,6 @@ local function FollowerList_Refresh(self, setXPGain)
 	if self.noRefresh == nil then
 		local fl = C_Garrison.GetFollowers(123)
 		local ft = C_Garrison.GetAutoTroops(123)
-		EV("I_MARK_FALSESTART_FOLLOWERS", fl)
 		for i=1,#ft do
 			FollowerButton_SetInfo(wt[i], ft[i])
 		end
@@ -700,7 +699,6 @@ local function FollowerList_OnUpdate(self)
 end
 local function DoomRun_OnEnter(self)
 	local ft, g, gn = C_Garrison.GetFollowers(123), {}, 0
-	EV("I_MARK_FALSESTART_FOLLOWERS", ft)
 	SortFollowerList(ft, true)
 	local getACS = C_Garrison.GetFollowerAutoCombatStats
 	for i=#ft,1,-1 do
@@ -740,10 +738,11 @@ local function DoomRun_OnClick(self, button)
 	if GameTooltip:IsOwned(self) then
 		GameTooltip:Hide()
 	end
-	U.StoreMissionGroup(mid, g)
-	PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
 	if button == "RightButton" then
-		U.SendMissionGroup(mid, g)
+		U.StartMissionWithDelay(mid, g)
+	else
+		U.StoreMissionGroup(mid, g)
+		PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
 	end
 	EV("I_MISSION_LIST_UPDATE")
 end
@@ -825,7 +824,7 @@ local function UButton_OnEnter(self)
 	end
 end
 local function UButton_OnClick(self, button)
-	local m = self.mode
+	local m, snd = self.mode, SOUNDKIT.U_CHAT_SCROLL_BUTTON
 	if U.IsStartingMissions() and m == "stop-send" then
 		U.StopStartingMissions()
 	elseif U.IsCompletingMissions() and m == "stop-complete" then
@@ -833,6 +832,7 @@ local function UButton_OnClick(self, button)
 	elseif m == "stop-delayed-send" then
 		U.ClearDelayedStartMissions()
 		U.StopStartingMissions()
+		snd = 39514
 	elseif m == "start-complete" then
 		U.StartCompletingMissions()
 	elseif U.HaveTentativeGroups() and m == "start-send" then
@@ -842,7 +842,7 @@ local function UButton_OnClick(self, button)
 			U.SendTentativeGroups()
 		end
 	end
-	PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
+	PlaySound(snd)
 	UButton_Sync(self)
 end
 local function UButton_OnKeyDown(self, button)
@@ -1319,8 +1319,13 @@ function Factory.MissionButton(parent)
 	t:SetText("Expired")
 	t:GetFontString():SetJustifyH("LEFT")
 	t:SetMouseClickEnabled(false)
-	s.ExpireTime = t
-	CreateObject("CountdownText", cf, t)
+	t, s.ExpireTime = cf:CreateTexture(nil, "ARTWORK"), t
+	CreateObject("CountdownText", cf, s.ExpireTime)
+	t:SetPoint("TOPRIGHT", -10, -23)
+	t:SetSize(24, 24)
+	t:SetVertexColor(0.85, 0.85, 0.75)
+	t:SetAtlas("UI-QuestPoiCampaign-QuestNumber-SuperTracked")
+	s.TentativeMarker = t
 
 	t = CreateFrame("Frame", nil, cf)
 	t:SetPoint("TOP", 0, -4)
@@ -1332,7 +1337,7 @@ function Factory.MissionButton(parent)
 		s.Rewards[j] = rew
 	end
 	t = CreateObject("AchievementRewardIcon", cf)
-	t:SetPoint("RIGHT", cf, "TOPRIGHT", -20, -40)
+	t:SetPoint("RIGHT", cf, "TOPRIGHT", -25, -40)
 	s.AchievementReward = t
 
 	t = CreateFrame("Frame", nil, cf)

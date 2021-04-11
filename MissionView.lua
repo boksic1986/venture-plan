@@ -699,7 +699,6 @@ local function Mission_Start()
 	local g, hc = MissionView_GetGroup()
 	if hc then
 		U.StartMissionWithDelay(mid, g)
-		PlaySound(158565)
 		CovenantMissionFrame:CloseMission()
 	end
 end
@@ -750,8 +749,9 @@ local function Shuffler_OnUpdate(self)
 	if fin then
 		self:SetScript("OnUpdate", nil)
 		if g then
+			Shuffler_AssignGroup(g)
 			Shuffler_OnLeave(self)
-			return Shuffler_AssignGroup(g)
+			return
 		end
 	end
 	if GameTooltip:IsOwned(self) then

@@ -38,71 +38,11 @@ local AddMissionAchievementInfo do
 end
 
 local MissionPage, MissionList
-
-local startedMissions, finishedMissions, FlagMissionFinish, GetReservedAnima = {}, {} do
-	local followerLock, followerLockMission, costLock, lockedCosts = {}, {}, {}, 0
-	hooksecurefunc(C_Garrison, "StartMission", function(mid)
-		if not mid or C_Garrison.GetFollowerTypeByMissionID(mid) ~= 123 then return end
-		startedMissions[mid] = 1
-		local mi = C_Garrison.GetBasicMissionInfo(mid)
-		local et = GetTime()+(mi and mi.durationSeconds or 3600)
-		for i=1,mi and mi.followers and #mi.followers or 0 do
-			local fid = mi.followers[i]
-			followerLock[fid] = et
-			U.ReleaseTentativeFollowerForMission(fid, mid, true)
-		end
-		lockedCosts, costLock[mid] = lockedCosts - (costLock[mid] or 0) + (mi and mi.cost or 0), mi and mi.cost or nil
-	end)
-	function EV:GARRISON_MISSION_NPC_CLOSED(ft)
-		if ft ~= 123 then
-			return
-		end
-		startedMissions = {}
-		finishedMissions = {}
-		followerLock, followerLockMission = {}, {}
-		costLock, lockedCosts = {}, 0
-		if MissionList then
-			S[MissionList]:ReturnToTop()
-		end
-	end
-	function EV:GARRISON_MISSION_STARTED(_, mid)
-		if mid then
-			startedMissions[mid] = nil
-		end
-		if costLock[mid] then
-			lockedCosts, costLock[mid] = lockedCosts - costLock[mid], nil
-		end
-		for k, v in pairs(followerLockMission) do
-			if v == mid then
-				followerLockMission[k], followerLock[k] = nil
-			end
-		end
-	end
-	function EV:I_MARK_FALSESTART_FOLLOWERS(fa)
-		for i=1,fa and #fa or 0 do
-			local fi = fa[i]
-			local et = followerLock[fi.followerID]
-			if et and not fi.isAutoTroop then
-				fi.status = GARRISON_FOLLOWER_ON_MISSION
-				fi.missionTimeEnd = et
-			end
-		end
-	end
-	function EV:I_RELEASE_FALSESTART_FOLLOWERS()
-		for k in pairs(followerLock) do
-			followerLock[k], followerLockMission[k] = nil
-		end
-	end
-	function FlagMissionFinish(mid)
-		if mid then
-			finishedMissions[mid] = 1
-		end
-	end
-	function GetReservedAnima()
-		return lockedCosts
+function EV:GARRISON_MISSION_NPC_CLOSED()
+	if MissionList then
+		S[MissionList]:ReturnToTop()
 	end
 end
-
 local function LogCounter_OnClick()
 	local cb = MissionPage.CopyBox
 	cb.Title:SetText(L"Wanted: Adventure Reports")
@@ -169,14 +109,16 @@ local function ConfigureMission(me, mi, isAvailable, haveSpareCompanions, availA
 	local veilShade = mi.timeLeftSeconds and 0.65 or 1
 	local showDoomRun = haveSpareCompanions and not isMissionActive and isSufficientAnima and not mi.hasTentativeGroup
 	local showTentative = not not mi.hasTentativeGroup and not isMissionActive
+	local showPendingStart = showTentative and mi.hasPendingStart
 	local shiftView = showDoomRun or showTentative
 	ms.Veil:SetShown(isMissionActive)
 	ms.ProgressBar:SetShown(isMissionActive and not mi.isFakeStart)
 	ms.ViewButton:SetShown(not isMissionActive)
-	ms.ViewButton:SetText(isSufficientAnima and (showTentative and L"Edit party" or L"Select adventurers") or L"Insufficient anima")
+	ms.ViewButton:SetText(showPendingStart and L"Starting soon..." or isSufficientAnima and (showTentative and L"Edit party" or L"Select adventurers") or L"Insufficient anima")
 	ms.DoomRunButton:Hide()
 	ms.DoomRunButton:SetShown(showDoomRun)
 	ms.TentativeClear:SetShown(showTentative)
+	ms.TentativeMarker:SetShown(showTentative)
 	ms.ViewButton:SetPoint("BOTTOM", shiftView and 20 or 0, 12)
 	for i=1,#ms.Rewards do
 		ms.Rewards[i].RarityBorder:SetVertexColor(veilShade, veilShade, veilShade)
@@ -212,20 +154,20 @@ local function ConfigureMission(me, mi, isAvailable, haveSpareCompanions, availA
 	me:Show()
 end
 local function cmpMissionInfo(a,b)
-	local ac, bc = a.completed or a.timeLeftSeconds == 0, b.completed or b.timeLeftSeconds == 0
-	if ac ~= bc then
-		return ac
-	end
-	ac, bc = a.timeLeftSeconds, b.timeLeftSeconds
+	local ac, bc = a.timeLeftSeconds, b.timeLeftSeconds
 	if (not ac) ~= (not bc) then
 		return not ac
 	end
 	if ac ~= bc then
 		return ac < bc
 	end
+	ac, bc = a.hasPendingStart, b.hasPendingStart
+	if ac ~= bc then
+		return bc
+	end
 	ac, bc = a.hasTentativeGroup, b.hasTentativeGroup
 	if ac ~= bc then
-		return ac
+		return bc
 	end
 	ac, bc = a.sortGroup, b.sortGroup
 	if ac ~= bc then
@@ -249,7 +191,6 @@ local function UpdateMissions()
 	local cMissions = C_Garrison.GetCompleteMissions(123)
 	local numFreeCompanions, numFreeCompanionsL, haveRookies = 0, 0, false do
 		local ft = C_Garrison.GetFollowers(123)
-		EV("I_MARK_FALSESTART_FOLLOWERS", ft)
 		for i=1,#ft do
 			local fi = ft[i]
 			if fi.isCollected and fi.status ~= GARRISON_FOLLOWER_ON_MISSION then
@@ -264,9 +205,7 @@ local function UpdateMissions()
 	for i=1,#missions do
 		local m = missions[i]
 		local mid = m.missionID
-		if startedMissions[mid] and not m.timeLeftSeconds then
-			m.timeLeftSeconds, m.offerEndTime = m.durationSeconds
-		else
+		if not m.timeLeftSeconds then
 			local rs = 0
 			for i=1, m.rewards and #m.rewards or 0 do
 				i = m.rewards[i]
@@ -281,6 +220,7 @@ local function UpdateMissions()
 			m.sortGroup = rs
 		end
 		m.hasTentativeGroup = U.MissionHasTentativeGroup(mid)
+		m.hasPendingStart = U.IsMissionStartingSoon(mid)
 	end
 	for i=1,inProgressMissions and #inProgressMissions or 0 do
 		missions[#missions+1] = inProgressMissions[i]
@@ -293,7 +233,7 @@ local function UpdateMissions()
 				break
 			end
 		end
-		if cid and not finishedMissions[cid] then
+		if cid then
 			missions[#missions+1] = cMissions[i]
 		end
 	end
@@ -301,7 +241,7 @@ local function UpdateMissions()
 	table.sort(missions, cmpMissionInfo)
 	
 	local anima = C_CurrencyInfo.GetCurrencyInfo(1813)
-	anima = (anima and anima.quantity or 0) - GetReservedAnima()
+	anima = (anima and anima.quantity or 0)
 	local Missions = MissionList.Missions
 	for i=1,#missions do
 		ConfigureMission(Missions[i], missions[i], true, numFreeCompanionsL > 0, anima)
@@ -314,6 +254,16 @@ local function UpdateMissions()
 	MissionPage.UnButton:Sync()
 	MissionPage.CompanionCounter:SetText(numFreeCompanions)
 end
+local function CheckItemRewards(w)
+	local hadItems, hadUnknowns = false, false
+	for j=2,3 do
+		local rw = S[w].Rewards[j]
+		if rw and rw:IsShown() and rw.itemID and (not rw.itemLink or rw.itemLink:match("|h%[%]|h")) then
+			hadItems, hadUnknowns = true, hadUnknowns or (GetItemInfo(rw.itemLink or rw.itemID) == nil)
+		end
+	end
+	return hadItems, hadUnknowns
+end
 local function CheckRewardCache()
 	if MissionList.clearedRewardSync == true or not S[MissionList]:IsVisible() then
 		return
@@ -322,15 +272,12 @@ local function CheckRewardCache()
 	for i=1,#mwa do
 		local w = mwa[i]
 		if w:IsShown() then
-			for j=2,3 do
-				local rw = S[w].Rewards[j]
-				if rw:IsShown() and rw.itemID and (not rw.itemLink or rw.itemLink:match("|h%[%]|h")) then
-					local mi = C_Garrison.GetBasicMissionInfo(S[w].missionID)
-					S[w].Rewards:SetRewards(mi.xp, mi.rewards)
-					isCleared = isCleared and GetItemInfo(rw.itemLink or rw.itemID) ~= nil
-					break
-				end
+			local refresh, unclear = CheckItemRewards(w)
+			local mi = refresh and C_Garrison.GetBasicMissionInfo(S[w].missionID)
+			if mi and mi.rewards then
+				S[w].Rewards:SetRewards(mi.xp, mi.rewards)
 			end
+			isCleared = isCleared and not unclear
 		end
 	end
 	MissionList.clearedRewardSync = isCleared
@@ -441,16 +388,15 @@ function EV:I_ADVENTURES_UI_LOADED()
 		UpdateMissions()
 		LogCounter_Update()
 	end)
-	hooksecurefunc(C_Garrison, "MissionBonusRoll", FlagMissionFinish)
 	EV.I_STORED_LOG_UPDATE = LogCounter_Update
 	EV.GARRISON_MISSION_LIST_UPDATE = QueueListSync
 	EV.GARRISON_MISSION_FINISHED = QueueListSync
 	EV.I_MISSION_LIST_UPDATE = QueueListSync
+	EV.I_DELAYED_START_UPDATE = QueueListSync
 	EV.GET_ITEM_INFO_RECEIVED = CheckRewardCache
 	EV.I_TENTATIVE_GROUPS_CHANGED = UBSync
 	EV.I_MISSION_QUEUE_CHANGED = UBSync
 	EV.I_COMPLETE_QUEUE_UPDATE = UBSync
-	EV.I_DELAYED_START_UPDATE = UBSync
 	EV.I_MISSION_COMPLETION_STEP = MissionComplete_Toast
 	MissionPage.CopyBox.ResetButton:SetScript("OnClick", function(self)
 		EV("I_RESET_STORED_LOGS")
