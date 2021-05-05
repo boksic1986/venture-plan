@@ -130,7 +130,7 @@ local function ConfigureMission(me, mi, haveSpareCompanions, availAnima)
 	
 	me:Show()
 end
-local function cmpMissionInfo(a,b)
+local function cmpMissionInfo(a, b)
 	local ac, bc = a.timeLeftSeconds, b.timeLeftSeconds
 	if (not ac) ~= (not bc) then
 		return not ac
@@ -165,7 +165,7 @@ local function pushMissionSet(ni, missions, skip, ...)
 	table.sort(missions, cmpMissionInfo)
 	for i=1, #missions do
 		local mid = missions[i].missionID
-		for j=0, skip and #skip or 0, -1 do
+		for j=skip and #skip or 0, 0, -1 do
 			if j == 0 then
 				ni = ni + 1, ConfigureMission(MissionList.Missions[ni], missions[i], ...)
 			elseif skip[j].missionID == mid then

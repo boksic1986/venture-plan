@@ -700,6 +700,12 @@ local function MissionPage_OnClick(self, button)
 	end
 	GarrisonMissionPage_OnClick(self, button)
 end
+local function MissionPageFollower_OnMouseUp(self, frame, button)
+	if button == "RightButton" and not (frame.GetInfo and frame:GetInfo() or frame.info) then
+		return MissionPage_OnClick(self:GetMissionPage(), button)
+	end
+	return CovenantMissionFrame.OnMouseUpMissionFollower(self, frame, button)
+end
 local function MissionStart_OnClick(_self, button)
 	local mid = CovenantMissionFrame.MissionTab.MissionPage.missionInfo.missionID
 	local g, hc, zh = MissionView_GetGroup()
@@ -838,6 +844,8 @@ function EV:I_ADVENTURES_UI_LOADED()
 	hooksecurefunc(CovenantMissionFrame, "AssignFollowerToMission", MissionGroup_OnUpdate)
 	hooksecurefunc(CovenantMissionFrame, "RemoveFollowerFromMission", MissionGroup_OnUpdate)
 	MP:SetScript("OnClick", MissionPage_OnClick)
+	CovenantMissionFrame:UnregisterCallback(CovenantMission.Event.OnFollowerFrameMouseUp, CovenantMissionFrame)
+	CovenantMissionFrame:RegisterCallback(CovenantMission.Event.OnFollowerFrameMouseUp, MissionPageFollower_OnMouseUp, CovenantMissionFrame)
 	MP.StartMissionButton:SetScript("OnClick", MissionStart_OnClick)
 	MP.StartMissionButton:SetScript("OnEnter", MissionStart_OnEnter)
 	MP.StartMissionButton:RegisterForClicks("LeftButtonUp", "RightButtonUp")
