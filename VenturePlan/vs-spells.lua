@@ -350,39 +350,39 @@ T.KnownSpells = {
 	[57]={type="aura", target=0, duration=4, damageATK=100, noFirstTick=true},
 	[192]={type="nuke", target=1, damageATK=160},
 	[303]={type="nuke", target="enemy-back", damageATK=25},
-	
-	[349]={type="nuke", target="all-enemies", damageATK=10},
 
 	--New values for 9.1
 	--Contributors: TekGoNos, Zhavvorsa, Gaboros, Sehra, Ostjaevel, Ashmelev, Dphennessy
-	[305]={type="nuke", target="enemy-back", damageATK=120},
-	[315]={type="aura", target=1, damageATK1=150, duration=2, modDamageDealt=-30},
-	[326]={type="nuke", target="cleave", damageATK=25},
-	[327]={type="aura", target="all-other-allies", duration=3, plusDamageDealtATK=20},
-	[328]={type="nuke", target=0, damageATK=30},
-	[329]={type="aura", target=4, modDamageTaken=-50, duration=3},
-	[330]={type="aura", target=4, duration=2, plusDamageDealtATK=25},
-	[331]={type="aura", target="all-allies", plusDamageDealtATK=23, duration=3},
-	[333]={type="aura", target=4, duration=3, modDamageDealt=40},
-	[334]={type="nuke", target=0, damageATK=90},
-	[335]={type="nuke", target="enemy-back", damageATK=40},
-	[336]={type="heal", target=3, healATK=80},
-	[337]={type="aura", target=1, duration=4, damageATK1=200, damageATK=40, noFirstTick=true},
-	[338]={type="nuke", target=0, damageATK=50},
-	[339]={type="nuke", target="all-enemies", damageATK=120, firstTurn=3},
-	[341]={type="aura", target=1, damageATK1=120, duration=3, plusDamageTakenATK=20},
-	[342]={type="aura", target=0, damageATK1=100, duration=2, plusDamageDealtATK=-70},
+	[305]={type="nuke", target="enemy-back", damageATK=120}, --Roots of Submission
+	[315]={type="aura", target=1, damageATK1=150, duration=2, modDamageDealt=-30}, --Resounding Message
+	[325]={type="aura", target="friend-surround", duration=2, modDamageDealt=60}, --Vision of Beauty
+	[326]={type="nuke", target="cleave", damageATK=25}, --Shiftless Smash
+	[327]={type="aura", target="all-other-allies", duration=3, plusDamageDealtATK=20}, --Inspirational Teachings
+	[328]={type="nuke", target=0, damageATK=30}, --Applied Lesson
+	[329]={type="aura", target=4, modDamageTaken=-50, duration=3}, --Muscle Up
+	[330]={type="aura", target="all-allies", duration=2, plusDamageDealtATK=20}, --Oversight
+	[331]={type="aura", target="all-other-allies", plusDamageDealtATK=20, duration=3}, --Supporting Fire
+	[332]={type="nuke", target=1, damageATK=150}, --Emptied Mug
+	[333]={type="aura", target=4, duration=3, modDamageDealt=40}, --Overload
+	[334]={type="nuke", target=0, damageATK=90}, --Hefty Package
+	[335]={type="nuke", target="enemy-back", damageATK=40}, --Errant Package
+	[336]={type="heal", target=3, healATK=80}, --Evidence of Wrongdoing
+	[337]={type="aura", target=1, duration=4, damageATK1=200, damageATK=40, noFirstTick=true}, --Wavebender's Tide
+	[338]={type="nuke", target=0, damageATK=50}, --Scallywag Slash
+	[339]={type="nuke", target="all-enemies", damageATK=120, firstTurn=3}, --Cannon Barrage
+	[341]={type="aura", target=1, damageATK1=120, duration=3, plusDamageTakenATK=20}, --Tainted Bite
+	[342]={type="aura", target=0, damageATK1=100, duration=2, plusDamageDealtATK=-70}, --Regurgitated Meal
 	[343]={
 		{type="nuke", target="enemy-front", damageATK=80},
 		{type="aura", target=4, duration=1, modDamageDealt=20},
-	},
-	[345]={type="aura", target="all-allies" , duration=3 , modDamageTaken=-30},
-	[346]={type="aura", target=0, duration=2, damageATK1=30, modDamageDealt=-1},
-	[349]={type="nuke", target="all-enemies", damageATK=8},
-	[332]={type="nuke", target=1, damageATK=150},
+	}, --Sharptooth Snarl
+	[344]={type="nuke", target="all-enemies", damageATK=30}, --Razorwing Buffet
+	[345]={type="aura", target="all-allies" , duration=3 , modDamageTaken=-30}, --Protective Wings
+	[346]={type="aura", target=0, duration=2, damageATK1=30, modDamageDealt=-1}, --Heel Bite
+	[347]={type="nuke", target="cone", damageATK=100}, --Darkness from Above
 	[348]={
 		{type="nuke", target=1, damageATK=120},
 		{type="aura", target=1, duration=3, modDamageTaken=24},
-	},
-	[347]={type="nuke", target="cone", damageATK=100},
+	}, --Tainted Bite
+	[349]={type="nuke", target="all-enemies", damageATK=8}, --Anima Swell
 }
