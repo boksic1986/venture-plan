@@ -352,7 +352,6 @@ T.KnownSpells = {
 	[303]={type="nuke", target="enemy-back", damageATK=25},
 
 	--New values for 9.1
-	--Contributors: TekGoNos, Zhavvorsa, Gaboros, Sehra, Ostjaevel, Ashmelev, Dphennessy, Simca
 	[305]={type="nuke", target="enemy-back", damageATK=120}, --Roots of Submission
 	[306]={type="aura", target=3, duration=3, modMaxHP=60, plusDamageDealtATK=40}, --Arcane Empowerment (UNVERIFIED)
 	[307]={type="nuke", target="cone", damageATK=160}, --Fist of Nature (UNVERIFIED)
@@ -402,13 +401,16 @@ T.KnownSpells = {
 	[333]={type="aura", target=4, duration=3, modDamageDealt=40}, --Overload
 	[334]={type="nuke", target=0, damageATK=90}, --Hefty Package
 	[335]={type="nuke", target="enemy-back", damageATK=40}, --Errant Package
-	[336]={type="heal", target=3, healATK=80}, --Evidence of Wrongdoing (UNVERIFIED)
+	[336]={type="heal", target=3, healATK=80}, --Evidence of Wrongdoing
 	[337]={type="aura", target=1, duration=4, damageATK1=200, damageATK=40, noFirstTick=true}, --Wavebender's Tide
 	[338]={type="nuke", target=0, damageATK=50}, --Scallywag Slash
 	[339]={type="nuke", target="all-enemies", damageATK=120, firstTurn=3}, --Cannon Barrage
 	[340]={type="nuke", target=1, damageATK=60}, --Tainted Bite (UNVERIFIED)
-	[341]={type="aura", target=1, damageATK1=120, duration=3, plusDamageTakenATK=20}, --Tainted Bite (UNVERIFIED)
-	[342]={type="aura", target=0, damageATK1=100, duration=2, plusDamageDealtATK=-70}, --Regurgitated Meal (UNVERIFIED)
+	[341]={type="aura", target=1, damageATK1=120, duration=3, plusDamageTakenATK=20}, --Tainted Bite
+	[342]={
+		{type="nuke", target=0, damageATK=100},
+		{type="aura", target=0, duration=2, plusDamageDealtATK=-70},
+	}, --Regurgitated Meal
 	[343]={
 		{type="nuke", target="enemy-front", damageATK=80},
 		{type="aura", target=4, duration=1, modDamageDealt=20},
@@ -420,6 +422,6 @@ T.KnownSpells = {
 	[348]={
 		{type="nuke", target=1, damageATK=120},
 		{type="aura", target=1, duration=3, plusDamageTakenATK=20},
-	}, --Tainted Bite (UNVERIFIED)
+	}, --Tainted Bite
 	[349]={type="nuke", target="all-enemies", damageATK=10}, --Anima Swell
 }

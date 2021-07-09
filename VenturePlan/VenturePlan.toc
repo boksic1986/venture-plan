@@ -1,6 +1,6 @@
 ## Interface: 90100
 ## Title: Venture Plan
-## Version: 4.22
+## Version: 4.23
 ## Notes: Interface improvements for Adventures.
 ## Notes-deDE: Verbesserungen der Benutzeroberfläche für den Befehlstisch.
 ## Notes-esES: Mejoras de la interfaz para las aventuras.
@@ -17,6 +17,7 @@
 ## SavedVariables: VP_MissionReports
 ## SavedVariablesPerCharacter: VP_SPC
 Libs/Evie.lua
+libs\LibParse\LibParse.lua
 Locale.lua
 Util.lua
 Widgets.lua
