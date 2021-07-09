@@ -1235,12 +1235,112 @@ function Factory.RaisedBorder(parent)
 		t:SetAlpha(0.45)
 	end
 end
+function Factory.LockedCopyInputBox(parent)
+	local f = CreateFrame("EditBox", nil, parent, "InputBoxTemplate")
+	f:SetHighlightColor(1,0.8,0.3, 0.6)
+	f:SetScript("OnEscapePressed", f.ClearFocus)
+	f:SetScript("OnTextChanged", LockedInputBox_OnTextChanged)
+	f:SetAutoFocus(false)
+	f:SetSize(250, 20)
+	return f
+end
+function Factory.CopyBoxUI(parent)
+	local f = CreateFrame("Frame", nil, parent)
+	f:SetSize(335, 340)
+	f:SetFrameLevel(600)
+	f:SetPoint("CENTER")
+	local fbg = CreateFrame("Button", nil, f)
+	fbg:SetAllPoints(parent)
+	fbg:SetScript("OnMouseWheel", function() end)
+	fbg:SetScript("OnClick", function() if not f:IsMouseOver(0, 0, -10, 10) then f:Hide() end end)
+	fbg:RegisterForClicks("AnyUp")
+	fbg:EnableMouse(true)
+	fbg:SetFrameLevel(500)
+	local t = fbg:CreateTexture(nil, "BACKGROUND")
+	t:SetColorTexture(0,0,0,0.9)
+	t:SetAllPoints()
+	t = f:CreateTexture(nil, "BACKGROUND")
+	t:SetAtlas("UI-Frame-"..CovenKit.."-CardParchmentWider")
+	t:SetAllPoints()
+	t = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge2")
+	t:SetText("Moonkittens for sale")
+	t:SetPoint("TOP", 0, -34)
+	t, f.Title = f:CreateFontString(nil, "OVERLAY", "GameFontBlackMedium"), t
+	t:SetWidth(270)
+	t:SetPoint("TOP", f.Title, "BOTTOM", 0, -10)
+	t:SetJustifyH("LEFT")
+	t:SetTextColor(0.1, 0.1, 0.1)
+	t:SetText("These adorable rascals are guaranteed to moonfire literally everything around them.");
+	t, f.Intro = f:CreateFontString(nil, "OVERLAY", "GameFontBlackMedium"), t
+	t:SetWidth(270)
+	t:SetJustifyH("LEFT")
+	t:SetText("1. Moonfire.")
+	t:SetTextColor(0.1, 0.1, 0.1)
+	local ub = CreateObject("LockedCopyInputBox", f)
+	ub:SetPoint("TOP", f.Intro, "BOTTOM", 0, -60)
+	ub:SetText("Very moon,")
+	ub:SetTextColor(0.25, 0.75, 1)
+	t:SetPoint("BOTTOM", ub, "TOP", 0, 6)
+	f.FirstInputBox = ub
+	f.FirstInputBoxLabel = t
+
+	local cb = CreateObject("LockedCopyInputBox", f)
+	cb:SetPoint("TOP", ub, "TOP", 0, -50)
+	cb:SetText("Much fire!")
+	f.SecondInputBox = cb
+	t = f:CreateFontString(nil, "OVERLAY", "GameFontBlackMedium")
+	t:SetWidth(270)
+	t:SetJustifyH("LEFT")
+	t:SetPoint("BOTTOM", cb, "TOP", 0, 6)
+	t:SetText("2. Kittens.")
+	t:SetTextColor(0.1, 0.1, 0.1)
+	f.SecondInputBoxLabel = t
+
+	f:SetScript("OnKeyDown", function(self, key)
+		f:SetPropagateKeyboardInput(key ~= "ESCAPE")
+		if key == "ESCAPE" then
+			self:Hide()
+		end
+	end)
+
+	t = CreateObject("PanelButton", f)
+	t:SetPoint("BOTTOM", 0, 34 + (UIBUTTON_HEIGHT-22)/2)
+	t:SetWidth(216)
+	t:SetText("Reset")
+	t, f.ResetButton = CreateFrame("Button", nil, f, "UIPanelCloseButtonNoScripts"), t
+	t:SetPoint("TOPRIGHT", -8, -8)
+	t:SetScript("OnClick", function()
+		f:Hide()
+	end)
+	t, f.CloseButton2 = f:CreateFontString(nil, "OVERLAY", "GameFontBlackSmall"), t
+	t:SetPoint("BOTTOMRIGHT", -16, 14)
+	t:SetText(GetAddOnMetadata(AN, "Title") .. " v" .. GetAddOnMetadata(AN, "Version"))
+	f.VersionText = t
+
+	f:SetScript("OnHide", function(self)
+		if self:IsShown() then
+			self:Hide()
+		else
+			PlaySound(170568)
+		end
+		if self:GetParent().keyFocus == self then
+			self:GetParent().keyFocus = nil
+		end
+	end)
+	f:SetScript("OnShow", function(self)
+		self:GetParent().keyFocus = self
+	end)
+
+	return f
+end
 function Factory.MissionPage(parent)
 	local f = CreateFrame("Frame", nil, parent)
 	local s = CreateObject("Shadow", f)
 	f:SetAllPoints()
 	f:EnableMouse(true)
 	s.MissionList = CreateObject("MissionList", f)
+	s.CopyBox = CreateObject("CopyBoxUI", f)
+	s.CopyBox:Hide()
 	local resButton = CreateObject("ResourceButton", f, 1813) do
 		s.ResourceCounter = resButton
 		resButton:SetPoint("TOPRIGHT", -72, -30)
@@ -1256,6 +1356,12 @@ function Factory.MissionPage(parent)
 	local prButton = CreateObject("ResourceButton", f, 1889) do
 		s.ProgressCounter = prButton
 		prButton:SetPoint("RIGHT", ccButton, "LEFT", -35, 0)
+	end
+	local logsButton = CreateObject("ILButton", f, 1889) do
+		s.LogCounter = logsButton
+		logsButton:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+		logsButton.Icon:SetTexture("Interface/Icons/INV_Inscription_80_Scroll")
+		logsButton:SetPoint("RIGHT", prButton, "LEFT", -35, 0)
 	end
 	local uButton = CreateObject("PanelButton", f) do
 		s.UnButton, uButton.Glow = uButton, CreateObject("PanelButtonGlow", uButton)

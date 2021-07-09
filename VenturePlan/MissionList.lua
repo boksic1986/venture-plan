@@ -31,6 +31,25 @@ function EV:GARRISON_MISSION_NPC_CLOSED()
 		S[MissionList]:ReturnToTop()
 	end
 end
+local function LogCounter_OnClick()
+	local cb = MissionPage.CopyBox
+	cb.Title:SetText(L"Wanted: Adventure Reports")
+	cb.Intro:SetText(L"The Cursed Adventurer's Guide hungers. Only the tales of your companions' adventures, conveyed in excruciating detail, will satisfy it.")
+	cb.FirstInputBoxLabel:SetText(L"To submit your adventure reports," .. "|n" .. L"1. Visit:")
+	cb.SecondInputBoxLabel:SetText(L"2. Copy the following text:")
+	cb.ResetButton:SetText(L"Reset Adventure Reports")
+	cb.FirstInputBox:SetText("https://github.com/BloodDragon2580/venture-plan/issues/3")
+	cb.FirstInputBox:SetCursorPosition(0)
+	cb.SecondInputBox:SetText(T.ExportMissionReports())
+	cb.SecondInputBox:SetCursorPosition(0)
+	cb:Show()
+	PlaySound(170567)
+end
+local function LogCounter_Update()
+	local lc, c = MissionPage.LogCounter, T.GetMissionReportCount()
+	lc:SetShown(c > 0)
+	lc:SetText(BreakUpLargeNumbers(c))
+end
 
 local bufferedTentativeGroup = {}
 local function ConfigureMission(me, mi, haveSpareCompanions, availAnima)
@@ -306,6 +325,9 @@ function EV:I_ADVENTURES_UI_LOADED()
 	MissionPage = T.CreateObject("MissionPage", CovenantMissionFrame.MissionTab)
 	MissionList = MissionPage.MissionList
 	T.MissionList = MissionList
+	local lc = MissionPage.LogCounter
+	lc.tooltipHeader, lc.tooltipText = "|cff1eff00" .. L"Adventure Report", NORMAL_FONT_COLOR_CODE .. L"A detailed record of an adventure completed by your companions." .. "|n|n|cff1eff00" .. L"Use: Feed the Cursed Adventurer's Guide."
+	lc:SetScript("OnClick", LogCounter_OnClick)
 	HookAndCallOnShow(CovenantMissionFrame.MissionTab.MissionList, function(self)
 		self:Hide()
 		S[MissionPage]:Show()
@@ -313,7 +335,9 @@ function EV:I_ADVENTURES_UI_LOADED()
 	HookAndCallOnShow(S[MissionList], function()
 		CovenantMissionFrameFollowers:Hide()
 		UpdateMissions()
+		LogCounter_Update()
 	end)
+	EV.I_STORED_LOG_UPDATE = LogCounter_Update
 	EV.GARRISON_MISSION_LIST_UPDATE = QueueListSync
 	EV.GARRISON_MISSION_FINISHED = QueueListSync
 	EV.I_MISSION_LIST_UPDATE = QueueListSync
@@ -323,6 +347,10 @@ function EV:I_ADVENTURES_UI_LOADED()
 	EV.I_MISSION_QUEUE_CHANGED = UBSync
 	EV.I_COMPLETE_QUEUE_UPDATE = UBSync
 	EV.I_MISSION_COMPLETION_STEP = MissionComplete_Toast
+	MissionPage.CopyBox.ResetButton:SetScript("OnClick", function(self)
+		EV("I_RESET_STORED_LOGS")
+		self:GetParent():Hide()
+	end)
 	EV.I_UPDATE_CURRENCY_SHIFT = function(e, cid)
 		local p = MissionPage.ProgressCounter:GetScript("OnEvent")
 		p(MissionPage.ProgressCounter, e, cid)

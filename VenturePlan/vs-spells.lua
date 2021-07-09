@@ -352,7 +352,6 @@ T.KnownSpells = {
 	[303]={type="nuke", target="enemy-back", damageATK=25},
 
 	--New values for 9.1
-	--Contributors: TekGoNos, Zhavvorsa, Gaboros, Sehra, Ostjaevel, Ashmelev, Dphennessy, Simca
 	[305]={type="nuke", target="enemy-back", damageATK=120}, --Roots of Submission
 	[306]={type="aura", target=3, duration=3, modMaxHP=60, plusDamageDealtATK=40}, --Arcane Empowerment (UNVERIFIED)
 	[307]={type="nuke", target="cone", damageATK=160}, --Fist of Nature (UNVERIFIED)
