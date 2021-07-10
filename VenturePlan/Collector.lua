@@ -2,16 +2,10 @@ local _, T = ...
 local EV = T.Evie
 local LibParse = LibStub("LibParse");
 
-local serialize do
-	local sigT, sigN = {}
-	local sReg, sRegRev, sign = {__index={true, false, "newHealth", "oldHealth", "maxHealth", "boardIndex", "type", "casterBoardIndex", "spellID", "auraType", "effectIndex", "targetInfo", "schoolMask", "points", "events" , "missionID", "missionScalar"}}, {__index={}}, string.char(77,85,119,83,110,77,105)
-	for k,v in pairs(sReg.__index) do sRegRev.__index[v] = k end
-	for i, c in ("01234qwertyuiopasdfghjklzxcvbnm5678QWERTYUIOPASDFGHJKLZXCVBNM9"):gmatch("()(.)") do sigT[i-1], sigT[c], sigN = c, i-1, i end
-
-	function serialize(data)
-		return LibParse:JSONEncode(data)
-	end
+local function serialize(data)
+	return LibParse:JSONEncode(data)
 end
+
 local function GetCompletedMissionInfo(mid)
 	local ma = C_Garrison.GetCompleteMissions(123)
 	for i=1,#ma do
