@@ -30,6 +30,7 @@ Please if you want to upload logs do it on github!
 
 # Installation
 
-You can use an addon manager like [WowUP](https://wowup.io/). You only need to link the repo and it will install the latest release.
+You can use an addon manager like [WowUP](https://wowup.io/). You only need to link the repo and it will install the latest release. 
+Just press the "Install from URL" button and copy this url.
 You can also install manually by coping everything from the addon folder into \Interface\Addons\VenturePlan folder.
 </p>
