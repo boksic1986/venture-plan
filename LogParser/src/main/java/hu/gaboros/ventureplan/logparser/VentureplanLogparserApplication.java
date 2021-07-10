@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.gaboros.ventureplan.logparser.model.MissionReport;
+import hu.gaboros.ventureplan.logparser.service.AutoAttackOverrideService;
 import hu.gaboros.ventureplan.logparser.service.MissionService;
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,7 +28,8 @@ public class VentureplanLogparserApplication {
   }
 
   @Bean
-  public CommandLineRunner runner(MissionService missionService) {
+  public CommandLineRunner runner(
+      MissionService missionService, AutoAttackOverrideService autoAttackOverrideService) {
     return args -> {
       ObjectMapper mapper = new ObjectMapper();
 
@@ -43,6 +45,7 @@ public class VentureplanLogparserApplication {
                   mapper.readValue(mission, new TypeReference<MissionReport>() {});
               missionReport.setLogContent(mission);
               missionService.save(missionReport);
+              autoAttackOverrideService.save(missionReport);
               parsedLogs++;
             } catch (JsonParseException jsonParseException) {
               // skip, probably just old format

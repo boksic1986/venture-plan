@@ -2,6 +2,7 @@ package hu.gaboros.ventureplan.logparser.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import javax.persistence.*;
 import lombok.Data;
 
@@ -18,6 +19,13 @@ public class MissionReport {
   @JsonProperty private Boolean predictionCorrect;
   @JsonProperty private String addonVersion;
   @JsonProperty private String missionName;
+
+  @JsonProperty(value = "missionID")
+  private Long missionId;
+
+  @Transient // for now
+  @JsonProperty
+  private List<Encounter> encounters;
 
   @Column(columnDefinition = "longtext")
   private String logContent;
