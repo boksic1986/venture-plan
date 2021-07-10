@@ -195,11 +195,11 @@ function T.GetMissionReportCount()
 	return type(VP_MissionReports) == "table" and #VP_MissionReports or 0
 end
 function T.ExportMissionReports()
-	local s = ""
+	local missionReportString = "Version: " .. GetAddOnMetadata("VenturePlan", "Version")
 	for i=1,VP_MissionReports and #VP_MissionReports or 0 do
-		s = (i > 1 and s .. "\n" or "") .. VP_MissionReports[i][1]
+		missionReportString = missionReportString .. "\n" .. VP_MissionReports[i][1]
 	end
-	return s
+	return missionReportString
 end
 function T.GetMissionReportInfo(mid)
 	if mid == LR_MissionID then
