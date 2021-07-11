@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -36,6 +37,7 @@ public class VentureplanLogparserApplication {
 
       int parsedLogs = 0;
       int newLogs = 0;
+      int newInvalidPrediction = 0;
       long startTime = System.currentTimeMillis();
       for (final File fileEntry : folder.listFiles()) {
         try (BufferedReader br = new BufferedReader(new FileReader(fileEntry))) {
@@ -47,6 +49,9 @@ public class VentureplanLogparserApplication {
               parsedLogs++;
               if (newLogCreated) {
                 newLogs++;
+                if (BooleanUtils.isFalse(missionReport.getPredictionCorrect())) {
+                  newInvalidPrediction++;
+                }
               }
             } catch (JsonParseException jsonParseException) {
               // skip, probably just old format
@@ -61,6 +66,7 @@ public class VentureplanLogparserApplication {
 
       log.info("Number of logs parsed: {}", parsedLogs);
       log.info("Number of logs created: {}", newLogs);
+      log.info("Number of new invalid predictions: {}", newInvalidPrediction);
       log.info(
           "Elapsed time: {}:{}",
           StringUtils.leftPad(String.valueOf(minutes), 2, "0"),
