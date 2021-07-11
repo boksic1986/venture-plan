@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - include:
+      file: ddl/create_hibernate_sequence.sql
+      relativeToChangelogFile: true
+  - include:
+      file: ddl/create_mission_report.sql
+      relativeToChangelogFile: true
+  - include:
+      file: ddl/create_auto_attack_override.sql
+      relativeToChangelogFile: true
+  - include:
+      file: views/failure_numbers_total.sql
+      relativeToChangelogFile: true
+  - include:
+      file: views/failure_numbers_with_bad_prediction.sql
+      relativeToChangelogFile: true
+  - include:
+      file: dml/default_hibernate_sequence.sql
+      relativeToChangelogFile: true
+  - include:
+      file: index/create_mission_report_index.sql
+      relativeToChangelogFile: true

@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MissionRepository extends JpaRepository<MissionReport, Long> {
 
-  @Query("select mr.id from MissionReport mr where mr.logContent = ?1")
-  Long findIdByLogContent(String logContent);
+  @Query("select mr.id from MissionReport mr where mr.hash = ?1")
+  Long findIdByHash(long hash);
 }

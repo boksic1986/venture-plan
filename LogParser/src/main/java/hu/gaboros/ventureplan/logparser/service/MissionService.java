@@ -10,11 +10,26 @@ public class MissionService {
 
   private final MissionRepository missionRepository;
 
-  public void save(MissionReport missionReport) {
-    // This will be slow...
-    Long id = missionRepository.findIdByLogContent(missionReport.getLogContent());
+  public boolean save(MissionReport missionReport, String content) {
+    long hash = createHash(content);
+
+    Long id = missionRepository.findIdByHash(hash);
     if (id == null) {
+      missionReport.setLogContent(content);
+      missionReport.setHash(hash);
       missionRepository.save(missionReport);
+      return true;
     }
+    return false;
+  }
+
+  private static long createHash(String string) {
+    long h = 1125899906842597L; // prime
+    int len = string.length();
+
+    for (int i = 0; i < len; i++) {
+      h = 31 * h + string.charAt(i);
+    }
+    return h;
   }
 }

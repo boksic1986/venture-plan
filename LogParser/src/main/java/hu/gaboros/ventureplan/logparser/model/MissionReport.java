@@ -29,4 +29,6 @@ public class MissionReport {
 
   @Column(columnDefinition = "longtext")
   private String logContent;
+
+  private Long hash;
 }
