@@ -135,13 +135,13 @@ local function findReportSlot(logs, st, novel)
 end
 function EV:GARRISON_MISSION_COMPLETE_RESPONSE(mid, _canCom, _suc, _bonusOK, _followerDeaths, autoCombatResult)
 	if not (autoCombatResult and autoCombatResult.combatLog and mid and C_Garrison.GetFollowerTypeByMissionID(mid) == 123) then return end
-	local combatResult = {
+	local cr = {
 		log=autoCombatResult.combatLog, winner=autoCombatResult.winner, missionID=mid,
 		meta={lc=GetLocale(), ts=math.floor(GetServerTime()/86400), cb=select(2,GetBuildInfo()), dv=1},
 	}
-	combatResult.encounters = C_Garrison.GetMissionCompleteEncounters(mid)
-	combatResult.environment = C_Garrison.GetAutoMissionEnvironmentEffect(mid)
-	for _, v in pairs(combatResult.encounters) do
+	cr.encounters = C_Garrison.GetMissionCompleteEncounters(mid)
+	cr.environment = C_Garrison.GetAutoMissionEnvironmentEffect(mid)
+	for _, v in pairs(cr.encounters) do
 		v.scale, v.portraitFileDataID, v.mechanics, v.height, v.displayID = nil
 		if v.autoCombatSpells then
 			for _, s in pairs(v.autoCombatSpells) do
@@ -149,8 +149,8 @@ function EV:GARRISON_MISSION_COMPLETE_RESPONSE(mid, _canCom, _suc, _bonusOK, _fo
 			end
 		end
 	end
-	if combatResult.environment and combatResult.environment.autoCombatSpellInfo then
-		local s = combatResult.environment.autoCombatSpellInfo
+	if cr.environment and cr.environment.autoCombatSpellInfo then
+		local s = cr.environment.autoCombatSpellInfo
 		s.previewMask, s.schoolMask, s.icon, s.spellTutorialFlag = nil
 	end
 	
@@ -169,17 +169,17 @@ function EV:GARRISON_MISSION_COMPLETE_RESPONSE(mid, _canCom, _suc, _bonusOK, _fo
 			spells=spa,
 		}
 	end
-	combatResult.followers = fm
-	combatResult.missionScalar = mi.missionScalar
-	combatResult.missionName = mi.name
-	local ok, checkpoints = generateCheckpoints(combatResult)
+	cr.followers = fm
+	cr.missionScalar = mi.missionScalar
+	cr.missionName = mi.name
+	local ok, checkpoints = generateCheckpoints(cr)
 	if ok then
-		local novel, nok, predictionCorrect = isNovelLog(combatResult, checkpoints)
-		combatResult.predictionCorrect = predictionCorrect
-		local combatResultString = serialize(combatResult)
-		VP_MissionReports = VP_MissionReports or {}
+		local st, novel, nok, om = serialize(cr), isNovelLog(cr, checkpoints)
+		cr.predictionCorrect = om
+		cr.addonVersion = GetAddOnMetadata("VenturePlan", "Version")
+		st = serialize(cr)
 		VP_MissionReports[findReportSlot(VP_MissionReports, combatResultString, novel)] = { combatResultString, ts= combatResult.meta.ts, novel=novel}
-		LR_MissionID, LR_Novelty = mid, nok and (novel and (om and 2 or 3) or 1) or 0
+		VP_MissionReports[findReportSlot(VP_MissionReports, st, novel)] = {st, ts=cr.meta.ts, novel=novel}
 		EV("I_STORED_LOG_UPDATE")
 	end
 end
