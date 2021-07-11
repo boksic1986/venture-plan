@@ -16,8 +16,8 @@ public class MissionReport {
   private Long id;
 
   @JsonProperty private Boolean winner;
-  @JsonProperty private Boolean predictionCorrect;
-  @JsonProperty private String addonVersion;
+  @JsonProperty private Boolean predictionCorrect = true;
+  @JsonProperty private String addonVersion = "5.1-beta";
   @JsonProperty private String missionName;
 
   @JsonProperty(value = "missionID")
