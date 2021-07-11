@@ -1,6 +1,10 @@
 package hu.gaboros.ventureplan.logparser.service;
 
-import hu.gaboros.ventureplan.logparser.model.MissionReport;
+import hu.gaboros.ventureplan.logparser.mapper.MissionReportMapper;
+import hu.gaboros.ventureplan.logparser.model.entity.MissionReportEntity;
+import hu.gaboros.ventureplan.logparser.model.json.MissionReport;
+import hu.gaboros.ventureplan.logparser.repository.MissionRepository;
+import hu.gaboros.ventureplan.logparser.util.HashUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,27 +13,19 @@ import org.springframework.stereotype.Service;
 public class MissionService {
 
   private final MissionRepository missionRepository;
+  private final MissionReportMapper missionReportMapper;
 
   public boolean save(MissionReport missionReport, String content) {
-    long hash = createHash(content);
+    long id = HashUtil.createHash(content);
 
-    Long id = missionRepository.findIdByHash(hash);
-    if (id == null) {
-      missionReport.setLogContent(content);
-      missionReport.setHash(hash);
-      missionRepository.save(missionReport);
+    boolean exists = missionRepository.existsById(id);
+    if (!exists) {
+      MissionReportEntity entity = missionReportMapper.dtoToEntity(missionReport);
+      entity.setId(id);
+      entity.setLogContent(content);
+      missionRepository.save(entity);
       return true;
     }
     return false;
-  }
-
-  private static long createHash(String string) {
-    long h = 1125899906842597L; // prime
-    int len = string.length();
-
-    for (int i = 0; i < len; i++) {
-      h = 31 * h + string.charAt(i);
-    }
-    return h;
   }
 }

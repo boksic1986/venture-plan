@@ -1,8 +1,9 @@
 package hu.gaboros.ventureplan.logparser.service;
 
-import hu.gaboros.ventureplan.logparser.model.AutoAttackOverride;
-import hu.gaboros.ventureplan.logparser.model.Encounter;
-import hu.gaboros.ventureplan.logparser.model.MissionReport;
+import hu.gaboros.ventureplan.logparser.model.entity.AutoAttackOverrideEntity;
+import hu.gaboros.ventureplan.logparser.model.json.Encounter;
+import hu.gaboros.ventureplan.logparser.model.json.MissionReport;
+import hu.gaboros.ventureplan.logparser.repository.AutoAttackOverrideRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,16 +18,16 @@ public class AutoAttackOverrideService {
   public void save(MissionReport missionReport) {
 
     for (Encounter encounter : missionReport.getEncounters()) {
-      Long autoCombatSpellID = encounter.getAutoCombatAutoAttack().getAutoCombatSpellID();
-      if (autoCombatSpellID != 15 && autoCombatSpellID != 11) {
-        log.warn("Unknown autoCombatSpellID:" + autoCombatSpellID);
+      Long autoCombatSpellId = encounter.getAutoCombatAutoAttack().getAutoCombatSpellId();
+      if (autoCombatSpellId != 15 && autoCombatSpellId != 11) {
+        log.warn("Unknown autoCombatSpellId:" + autoCombatSpellId);
         continue;
       }
 
-      AutoAttackOverride autoAttackOverride = new AutoAttackOverride();
+      AutoAttackOverrideEntity autoAttackOverride = new AutoAttackOverrideEntity();
       autoAttackOverride.setId(
           4 + 2 * encounter.getBoardIndex() + 32 * missionReport.getMissionId());
-      autoAttackOverride.setIsRanged(autoCombatSpellID == 15 ? 1 : 0);
+      autoAttackOverride.setIsRanged(autoCombatSpellId == 15 ? 1 : 0);
 
       autoAttackOverrideRepository.save(autoAttackOverride);
     }

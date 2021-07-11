@@ -3,8 +3,9 @@ package hu.gaboros.ventureplan.logparser;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hu.gaboros.ventureplan.logparser.model.MissionReport;
+import hu.gaboros.ventureplan.logparser.model.json.MissionReport;
 import hu.gaboros.ventureplan.logparser.service.MissionService;
+import hu.gaboros.ventureplan.logparser.service.SpellService;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -29,15 +30,16 @@ public class VentureplanLogparserApplication {
   }
 
   @Bean
-  public CommandLineRunner runner(MissionService missionService) {
+  public CommandLineRunner runner(MissionService missionService, SpellService spellService) {
     return args -> {
       ObjectMapper mapper = new ObjectMapper();
 
       final File folder = new File(logFolder);
 
-      int parsedLogs = 0;
-      int newLogs = 0;
-      int newInvalidPrediction = 0;
+      long parsedLogs = 0;
+      long newLogs = 0;
+      long newInvalidPrediction = 0;
+      long newSpells = 0;
       long startTime = System.currentTimeMillis();
       for (final File fileEntry : folder.listFiles()) {
         try (BufferedReader br = new BufferedReader(new FileReader(fileEntry))) {
@@ -53,6 +55,7 @@ public class VentureplanLogparserApplication {
                   newInvalidPrediction++;
                 }
               }
+              newSpells += spellService.save(missionReport);
             } catch (JsonParseException jsonParseException) {
               // skip, probably just old format
             }
@@ -67,6 +70,7 @@ public class VentureplanLogparserApplication {
       log.info("Number of logs parsed: {}", parsedLogs);
       log.info("Number of logs created: {}", newLogs);
       log.info("Number of new invalid predictions: {}", newInvalidPrediction);
+      log.info("Number of new spells: {}", newSpells);
       log.info(
           "Elapsed time: {}:{}",
           StringUtils.leftPad(String.valueOf(minutes), 2, "0"),

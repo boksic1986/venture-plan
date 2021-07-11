@@ -1,1 +1,1 @@
-CREATE INDEX mission_report_index ON mission_report(hash);
+CREATE INDEX mission_report_index ON mission_report(id);
