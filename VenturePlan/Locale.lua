@@ -1,5 +1,5 @@
 local _, T = ...
--- See https://www.townlong-yak.com/addons/venture-plan/localization
+-- See https://github.com/BloodDragon2580/venture-plan
 
 local C, z, V, K = GetLocale(), nil
 V =
