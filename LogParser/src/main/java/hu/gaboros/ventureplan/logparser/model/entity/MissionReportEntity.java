@@ -15,6 +15,7 @@ public class MissionReportEntity {
   private String addonVersion;
   private String missionName;
   private Long missionId;
+  private boolean isEnglish;
 
   @Column(columnDefinition = "longtext")
   private String logContent;

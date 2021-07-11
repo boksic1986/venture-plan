@@ -3,6 +3,7 @@ package hu.gaboros.ventureplan.logparser.model.json;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
+import java.util.Map;
 import javax.persistence.*;
 import lombok.Data;
 
@@ -19,4 +20,5 @@ public class MissionReport {
   private Long missionId;
 
   private List<Encounter> encounters;
+  private Map<String, Follower> followers;
 }

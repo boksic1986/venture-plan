@@ -26,6 +26,7 @@ dependencies {
 	implementation 'org.liquibase:liquibase-core'
 	implementation 'org.apache.commons:commons-lang3'
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+	implementation 'org.apache.tika:tika-langdetect:1.27'
 
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 

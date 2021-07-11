@@ -14,6 +14,7 @@ public class MissionService {
 
   private final MissionRepository missionRepository;
   private final MissionReportMapper missionReportMapper;
+  private final LanguageDetector languageDetector;
 
   public boolean save(MissionReport missionReport, String content) {
     long id = HashUtil.createHash(content);
@@ -23,6 +24,7 @@ public class MissionService {
       MissionReportEntity entity = missionReportMapper.dtoToEntity(missionReport);
       entity.setId(id);
       entity.setLogContent(content);
+      entity.setEnglish(languageDetector.isEnglish(missionReport.getMissionName()));
       missionRepository.save(entity);
       return true;
     }

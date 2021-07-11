@@ -9,16 +9,16 @@ databaseChangeLog:
       file: ddl/create_spell.sql
       relativeToChangelogFile: true
   - include:
-      file: views/create_view_failure_numbers_total.sql
+      file: views/create_view_bad_predictions_by_missions.sql
       relativeToChangelogFile: true
   - include:
-      file: views/create_view_failure_numbers_with_bad_prediction.sql
+      file: views/create_view_bad_predictions_by_versions.sql
       relativeToChangelogFile: true
   - include:
       file: views/create_view_spells.sql
       relativeToChangelogFile: true
   - include:
-      file: views/create_view_percentage_of_failure.sql
+      file: views/create_view_bad_predictions_by_versions.sql
       relativeToChangelogFile: true
   - include:
       file: index/create_mission_report_index.sql

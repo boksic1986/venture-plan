@@ -7,5 +7,6 @@ create table mission_report
     mission_name       varchar(255),
     prediction_correct bit,
     winner             bit,
+    is_english         bit,
     primary key (id)
 ) engine = InnoDB;

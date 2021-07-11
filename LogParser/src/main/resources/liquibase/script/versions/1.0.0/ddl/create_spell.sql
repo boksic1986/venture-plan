@@ -12,5 +12,6 @@ create table spell
     creature_name        varchar(255),
     creature_attack      bigint,
     is_enemy             bit,
+    is_english           bit,
     primary key (id)
 ) engine = InnoDB;

@@ -1,23 +1,19 @@
 package hu.gaboros.ventureplan.logparser.model.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Encounter implements Creature {
+public class Follower implements Creature {
 
-  private AutoAttack autoCombatAutoAttack;
-  private Boolean isElite;
-  private Long health;
+  private List<Spell> spells;
   private Long role;
   private String name;
   private Long boardIndex;
+  private Long health;
   private Long maxHealth;
+  private Long level;
   private Long attack;
-
-  @JsonProperty(value = "autoCombatSpells")
-  private List<Spell> spells;
 }
