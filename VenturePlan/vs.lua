@@ -831,9 +831,11 @@ function mu:cast(sourceIndex, sid, recast, qe)
 	else
 		local checkCast = mu.CheckCast(self,sourceIndex,sid)
 		if checkCast then
+			--cast success,enqueue after recast(cooldown) turn
 			enqc(self.queue, self.turn+recast, {"cast", sourceIndex, sid, recast, ord=ord, ord0=qe.ord0})
 			return mu.qcast(self, sourceIndex, sid, si[1] and 1 or 0, ord-1)
 		else
+			--cast fail,enqueue next turn
 			enqc(self.queue, self.turn+1, {"cast", sourceIndex, sid, recast, ord=ord, ord0=qe.ord0})
 			return
 		end
