@@ -48,6 +48,7 @@ public class VentureplanLogparserApplication {
       long parsedLogs = 0;
       long newLogs = 0;
       long newInvalidPrediction = 0;
+      long newDifferentOutcome = 0;
       long newSpells = 0;
       long startTime = System.currentTimeMillis();
       for (final File fileEntry : new File(logFolder).listFiles()) {
@@ -64,6 +65,9 @@ public class VentureplanLogparserApplication {
                 newLogs++;
                 if (BooleanUtils.isFalse(missionReport.getPredictionCorrect())) {
                   newInvalidPrediction++;
+                }
+                if (BooleanUtils.isTrue(missionReport.getDifferentOutcome())) {
+                  newDifferentOutcome++;
                 }
               }
               newSpells += spellService.save(missionReport);
@@ -82,6 +86,7 @@ public class VentureplanLogparserApplication {
       log.info("Number of logs parsed: {}", parsedLogs);
       log.info("Number of logs created: {}", newLogs);
       log.info("Number of new invalid predictions: {}", newInvalidPrediction);
+      log.info("Number of new different outcomes: {}", newDifferentOutcome);
       log.info("Number of new spells: {}", newSpells);
       log.info(
           "Elapsed time: {}:{}",

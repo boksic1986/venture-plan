@@ -15,6 +15,12 @@ databaseChangeLog:
       file: views/create_view_bad_predictions_by_versions.sql
       relativeToChangelogFile: true
   - include:
+      file: views/create_view_different_outcomes_by_missions.sql
+      relativeToChangelogFile: true
+  - include:
+      file: views/create_view_different_outcomes_by_versions.sql
+      relativeToChangelogFile: true
+  - include:
       file: views/create_view_spells.sql
       relativeToChangelogFile: true
   - include:

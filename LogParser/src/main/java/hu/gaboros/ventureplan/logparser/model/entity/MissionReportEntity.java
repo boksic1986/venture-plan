@@ -12,6 +12,7 @@ public class MissionReportEntity {
 
   private Boolean winner;
   private Boolean predictionCorrect;
+  private Boolean differentOutcome;
   private String addonVersion;
   private String missionName;
   private Long missionId;

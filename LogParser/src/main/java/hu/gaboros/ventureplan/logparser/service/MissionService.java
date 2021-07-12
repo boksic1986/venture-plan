@@ -25,6 +25,13 @@ public class MissionService {
       entity.setId(id);
       entity.setLogContent(content);
       entity.setEnglish(languageDetector.isEnglish(missionReport.getMissionName()));
+      // Before version 5.4-beta this variable was badly assumed.
+      if (entity.getDifferentOutcome() == null) {
+        entity.setDifferentOutcome(!entity.getPredictionCorrect());
+        entity.setPredictionCorrect(null);
+        missionReport.setDifferentOutcome(!missionReport.getPredictionCorrect());
+        missionReport.setPredictionCorrect(null);
+      }
       missionRepository.save(entity);
       return true;
     }

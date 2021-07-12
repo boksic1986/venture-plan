@@ -6,6 +6,7 @@ create table mission_report
     mission_id         bigint,
     mission_name       varchar(255),
     prediction_correct bit,
+    different_outcome  bit,
     winner             bit,
     is_english         bit,
     primary key (id)

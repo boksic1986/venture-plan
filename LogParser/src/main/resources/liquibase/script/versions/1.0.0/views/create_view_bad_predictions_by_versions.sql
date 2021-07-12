@@ -6,6 +6,7 @@ select all_missions.addon_version,
 from (select addon_version, count(*) as count
       from mission_report
       where addon_version <> '5.1-beta'
+        and prediction_correct is not null
       group by addon_version) as all_missions
          join (select addon_version, count(*) as count
                from mission_report
