@@ -829,9 +829,33 @@ function mu:cast(sourceIndex, sid, recast, qe)
 	if si.type == "passive" then
 		return mu.passive(self, sourceIndex, sid)
 	else
-		enqc(self.queue, self.turn+recast, {"cast", sourceIndex, sid, recast, ord=ord, ord0=qe.ord0})
+		local checkCast = mu.CheckCast(self,sourceIndex,sid)
+		if checkCast then
+			enqc(self.queue, self.turn+recast, {"cast", sourceIndex, sid, recast, ord=ord, ord0=qe.ord0})
+			return mu.qcast(self, sourceIndex, sid, si[1] and 1 or 0, ord-1)
+		else
+			enqc(self.queue, self.turn+1, {"cast", sourceIndex, sid, recast, ord=ord, ord0=qe.ord0})
+			return
+		end
 	end
-	return mu.qcast(self, sourceIndex, sid, si[1] and 1 or 0, ord-1)
+	--return mu.qcast(self, sourceIndex, sid, si[1] and 1 or 0, ord-1)
+end
+function mu:CheckCast(sourceIndex,sid)
+	local spellInfo,board = SpellInfo[sid], self.board
+	--only heal spell with single effect needs to be check
+	if spellInfo == nil or spellInfo[1] ~= nil or spellInfo.type ~= "heal" then
+		return true
+	end
+	local targets = VS.GetTargets(sourceIndex, spellInfo.target, board)
+	local cast = false
+	for i=1,targets and #targets or 0 do
+		local targetUnit = board[targets[i]]
+		if targetUnit.curHP > 0 and targetUnit.curHP < targetUnit.maxHP then
+			cast = true
+			break
+		end
+	end
+	return cast
 end
 function mu:qcast(sourceIndex, sid, eid, ord1, forkTarget)
 	local si, board = SpellInfo[sid], self.board
