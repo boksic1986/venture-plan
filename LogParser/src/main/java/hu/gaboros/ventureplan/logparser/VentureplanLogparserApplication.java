@@ -6,9 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.gaboros.ventureplan.logparser.model.json.MissionReport;
 import hu.gaboros.ventureplan.logparser.service.MissionService;
 import hu.gaboros.ventureplan.logparser.service.SpellService;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,8 +20,14 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class VentureplanLogparserApplication {
 
-  @Value("${ventureplan.log_folder}")
+  @Value("${ventureplan.unprocessed_log_folder}")
   private String logFolder;
+
+  @Value("${ventureplan.combined_log.folder}")
+  private String combinedLogFolder;
+
+  @Value("${ventureplan.combined_log.file}")
+  private String combinedLogFileName;
 
   public static void main(String[] args) {
     SpringApplication.run(VentureplanLogparserApplication.class, args);
@@ -34,14 +38,19 @@ public class VentureplanLogparserApplication {
     return args -> {
       ObjectMapper mapper = new ObjectMapper();
 
-      final File folder = new File(logFolder);
+      File combinedLogFile = new File(combinedLogFolder, combinedLogFileName);
+      if (!combinedLogFile.isFile()) {
+        combinedLogFile.createNewFile();
+      }
+      OutputStreamWriter writer =
+          new OutputStreamWriter(new FileOutputStream(combinedLogFile, true));
 
       long parsedLogs = 0;
       long newLogs = 0;
       long newInvalidPrediction = 0;
       long newSpells = 0;
       long startTime = System.currentTimeMillis();
-      for (final File fileEntry : folder.listFiles()) {
+      for (final File fileEntry : new File(logFolder).listFiles()) {
         try (BufferedReader br = new BufferedReader(new FileReader(fileEntry))) {
           String mission;
           while ((mission = br.readLine()) != null) {
@@ -50,6 +59,8 @@ public class VentureplanLogparserApplication {
               boolean newLogCreated = missionService.save(missionReport, mission);
               parsedLogs++;
               if (newLogCreated) {
+                writer.append(mission).append("\n");
+                writer.flush();
                 newLogs++;
                 if (BooleanUtils.isFalse(missionReport.getPredictionCorrect())) {
                   newInvalidPrediction++;
@@ -63,6 +74,7 @@ public class VentureplanLogparserApplication {
         }
       }
 
+      writer.close();
       long milliseconds = System.currentTimeMillis() - startTime;
       long minutes = (milliseconds / 1000) / 60;
       long seconds = (milliseconds / 1000) % 60;

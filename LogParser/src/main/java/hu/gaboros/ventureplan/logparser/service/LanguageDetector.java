@@ -1,6 +1,7 @@
 package hu.gaboros.ventureplan.logparser.service;
 
 import java.io.IOException;
+import java.util.List;
 import org.apache.tika.langdetect.OptimaizeLangDetector;
 import org.apache.tika.language.detect.LanguageResult;
 import org.springframework.stereotype.Service;
@@ -14,11 +15,12 @@ public class LanguageDetector {
   public LanguageDetector() throws IOException {
     this.languageDetector = new OptimaizeLangDetector();
     this.languageDetector.loadModels();
-    this.languageDetector.setShortText(true);
   }
 
   public boolean isEnglish(String content) {
-    LanguageResult languageResult = languageDetector.detect(content);
-    return languageResult.getLanguage() != null && languageResult.isLanguage(ENGLISH);
+    List<LanguageResult> languageResults = languageDetector.detectAll(content);
+    return languageResults != null
+        && !languageResults.isEmpty()
+        && languageResults.stream().anyMatch(languageResult -> languageResult.isLanguage(ENGLISH));
   }
 }
