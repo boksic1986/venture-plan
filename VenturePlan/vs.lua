@@ -1346,9 +1346,7 @@ function VS:New(team, encounters, envSpell, mid, mscalar, forkLimit)
 	for i=1,#encounters do
 		local e = encounters[i]
 		local rf, sa = {maxHP=e.maxHealth, curHP=e.maxHealth, atk=e.attack, slot=e.boardIndex}, e.autoCombatSpells
-		local aa = e.autoCombatAutoAttack and e.autoCombatAutoAttack.autoCombatSpellID
-		--local aa_old = VS:GetAutoAttack(e.role, rf.slot, mid, sa and sa[1] and sa[1].autoCombatSpellID)
-		--print("slot="..tostring(e.boardIndex)..",old="..tostring(aa_old)..",new="..tostring(aa))
+		local aa = VS:GetAutoAttack(e.role, rf.slot, mid, e.autoCombatAutoAttack and e.autoCombatAutoAttack.autoCombatSpellID)
 		missingSpells, pmask = addCasts(q, rf.slot, sa, aa, missingSpells, pmask)
 		board[e.boardIndex] = addActorProps(rf)
 	end
