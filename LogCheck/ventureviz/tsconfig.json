@@ -1,0 +1,10 @@
+{
+	"buildOptions": {
+		"incremental": true,
+	},
+	"compileOnSave": true,
+	"compilerOptions": {
+		"strict": true,
+		"lib": ["ES2018", "DOM"],
+	},
+}

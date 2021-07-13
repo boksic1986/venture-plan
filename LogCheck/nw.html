@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<title>Nordic Wellness</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"
+	      integrity="sha256-aAr2Zpq8MZ+YA/D6JtRD3xtrwpEz2IqOS+pWD/7XKIw=" crossorigin="anonymous">
+</head>
+<body>
+	<div class="container-fluid">
+		<div data-bind="css: { 'd-none': activities }" class="mt-5 text-center">
+			<div class="spinner-border"></div>
+		</div>
+		<table data-bind="css: { 'd-none': !activities }" class="d-none table table-hover table-sm">
+			<thead>
+				<tr>
+					<th>Time</th>
+					<th>Activity</th>
+					<th>Instructor</th>
+					<th>Slots</th>
+					<th>Location</th>
+				</tr>
+			</thead>
+			<tbody data-bind="foreach: activities">
+				<tr data-bind="css: { 'text-muted': status != 'Bookable' }">
+					<td data-bind="text: when"></td>
+					<td data-bind="text: name"></td>
+					<td data-bind="text: instructor"></td>
+					<td data-bind="text: slots"></td>
+					<td data-bind="text: location"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/knockout@3.5.1/build/output/knockout-latest.js"
+	        integrity="sha256-6JV7sYKlBHsHvqCkn9IrEWFLGrmsW4KG/LIln0hljnM=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/min/moment.min.js"
+	        integrity="sha256-ZsWP0vT+akWmvEMkNYgZrPHKU9Ke8nYBPC3dqONp1mY=" crossorigin="anonymous"></script>
+	<script>
+		let url = new URL("https://api1.nordicwellness.se/groupactivity/timeslot");
+		url.searchParams.set("clubIds", "11263,11264,15640");
+		
+		fetch(url)
+			.then(data => data.json())
+			.then(json => {
+				//console.log(json);
+				ko.applyBindings({
+					activities: json.groupActivities.map(x => ({
+						when: moment(x.StartTime).format('ll HH:mm') + '-' + moment(x.EndTime).format('HH:mm'),
+						name: x.Name,
+						instructor: x.Instructor,
+						slots: x.FreeSlots,
+						location: x.Location,
+						status: x.Status,
+					}))
+				});
+			});
+	</script>
+</body>
+</html>

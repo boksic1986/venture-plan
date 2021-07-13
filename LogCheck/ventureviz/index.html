@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+	<title>Venture Viz</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+
+<body id="body" class="container-fluid">
+	<h1>Venture Viz</h1>
+	<h2>Mission Data</h2>
+	<textarea data-bind="textInput: input" cols="120" rows="5" placeholder="Paste the logs here."></textarea>
+	<div data-bind="visible: views">
+		<h2>Mission View</h2>
+		<ul data-bind="foreach: views">
+			<li>
+				<a data-bind="attr: { href: ('#' + $index()) }, css:{ 'link-danger': !winner }, text: missionName"></a>
+			</li>
+		</ul>
+		<div data-bind="foreach: views">
+			<h3>
+				<a data-bind="attr: { name: $index }"></a>
+				<span data-bind="text: missionName, css: { 'text-danger': !winner }"></span>
+				(<span data-bind="text: missionID"></span>)
+			</h3>
+			<p>
+				<div>Addon Version: <span data-bind="text: addonVersion"></span></div>
+				<div>Prediction correct: <span data-bind="text: predictionCorrect"></span></div>
+				<div>Different outcome: <span data-bind="text: differentOutcome"></span></div>
+			</p>
+			<h4>Encounters</h4>
+			<ul data-bind="foreach: encounters">
+				<li>
+					<span data-bind="text: name"></span>
+					(<span data-bind="text: boardIndex"></span>),
+					Health <span data-bind="text: health"></span>/<span data-bind="text: maxHealth"></span>,
+					Attack <span data-bind="text: attack"></span>
+				</li>
+			</ul>
+			<h4>Followers</h4>
+			<ul data-bind="foreach: Object.values($data.followers)">
+				<li>
+					<span data-bind="text: name"></span>
+					(<span data-bind="text: boardIndex"></span>),
+					Level <span data-bind="text: level"></span>,
+					Health <span data-bind="text: health"></span>/<span data-bind="text: maxHealth"></span>,
+					Attack <span data-bind="text: attack"></span>
+				</li>
+			</ul>
+			<h4>Combat Log</h4>
+			<div data-bind="let: { board: board, spell: spell }">
+				<div data-bind="foreach: log">
+					<h5>Round <span data-bind="text: $index() + 1"></span>/<span data-bind="text: $parent.log.length"></span></h5>
+					<p>
+						<div data-bind="foreach: { data: events, as: 'event' }">
+							<div data-bind="foreach: { data: targetInfo, as: 'target' }">
+								<div data-bind="css: { 'text-danger': event.type == 9, 'text-success': event.type == 4 || event.type == 6 }">
+									<div data-bind="text: formatEvent(event, target, board, spell)"></div>
+								</div>
+							</div>
+						</div>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/knockout@3.5.1/build/output/knockout-latest.js"></script>
+	<script src="index.js"></script>
+</body>
+
+</html>
