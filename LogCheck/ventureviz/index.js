@@ -1,5 +1,14 @@
 "use strict";
 /// <reference types="knockout" />
+var FollowerRole;
+(function (FollowerRole) {
+    FollowerRole[FollowerRole["None"] = 0] = "None";
+    FollowerRole[FollowerRole["Melee"] = 1] = "Melee";
+    FollowerRole[FollowerRole["RangedPhysical"] = 2] = "RangedPhysical";
+    FollowerRole[FollowerRole["RangedMagic"] = 3] = "RangedMagic";
+    FollowerRole[FollowerRole["HealSupport"] = 4] = "HealSupport";
+    FollowerRole[FollowerRole["Tank"] = 5] = "Tank";
+})(FollowerRole || (FollowerRole = {}));
 function notNull(value) {
     if (value === null || value === undefined) {
         return false;
@@ -41,18 +50,18 @@ function formatEvent(event, target, board, spell) {
             return board.get(event.casterBoardIndex) + " (" + event.casterBoardIndex + ") cast " + spell.get(event.spellID) + " (" + event.spellID + ") at " + board.get(target.boardIndex) + " (" + target.boardIndex + ") for " + target.points + " " + spellSchoolName(event.schoolMask) + " damage (" + target.newHealth + "/" + target.maxHealth + ")";
         case EventType.SpellRangeDamage:
             return board.get(event.casterBoardIndex) + " (" + event.casterBoardIndex + ") cast " + spell.get(event.spellID) + " (" + event.spellID + ") at " + board.get(target.boardIndex) + " (" + target.boardIndex + ") for " + target.points + " " + spellSchoolName(event.schoolMask) + " damage (" + target.newHealth + "/" + target.maxHealth + ")";
+        case EventType.Heal:
+            return board.get(event.casterBoardIndex) + " (" + event.casterBoardIndex + ") cast " + spell.get(event.spellID) + " (" + event.spellID + ") on " + board.get(target.boardIndex) + " (" + target.boardIndex + ") for " + target.points + " healing (" + target.newHealth + "/" + target.maxHealth + ")";
         case EventType.PeriodicDamage:
             return board.get(event.casterBoardIndex) + "'s (" + event.casterBoardIndex + ") " + spell.get(event.spellID) + " (" + event.spellID + ") dealt " + target.points + " " + spellSchoolName(event.schoolMask) + " to " + board.get(target.boardIndex) + " (" + target.boardIndex + ") (" + target.newHealth + "/" + target.maxHealth + ")";
+        case EventType.PeriodicHeal:
+            return board.get(event.casterBoardIndex) + "'s (" + event.casterBoardIndex + ") " + spell.get(event.spellID) + " (" + event.spellID + ") healed " + board.get(target.boardIndex) + " (" + target.boardIndex + ") for " + target.points + " (" + target.newHealth + "/" + target.maxHealth + ")";
         case EventType.ApplyAura:
             return board.get(event.casterBoardIndex) + " (" + event.casterBoardIndex + ") applied " + spell.get(event.spellID) + " (" + event.spellID + ") to " + board.get(target.boardIndex) + " (" + target.boardIndex + ")";
         case EventType.RemoveAura:
             return board.get(event.casterBoardIndex) + " (" + event.casterBoardIndex + ") removed " + spell.get(event.spellID) + " (" + event.spellID + ") from " + board.get(target.boardIndex) + " (" + target.boardIndex + ")";
-        case EventType.Heal:
-            return board.get(event.casterBoardIndex) + " (" + event.casterBoardIndex + ") cast " + spell.get(event.spellID) + " (" + event.spellID + ") on " + board.get(target.boardIndex) + " (" + target.boardIndex + ") for " + target.points + " healing (" + target.newHealth + "/" + target.maxHealth + ")";
-        case EventType.PeriodicHeal:
-            return board.get(event.casterBoardIndex) + "'s (" + event.casterBoardIndex + ") " + spell.get(event.spellID) + " (" + event.spellID + ") healed " + board.get(target.boardIndex) + " (" + target.boardIndex + ") for " + target.points + " (" + target.newHealth + "/" + target.maxHealth + ")";
         case EventType.Died:
-            return board.get(event.casterBoardIndex) + "'s (" + event.casterBoardIndex + ") killed " + board.get(target.boardIndex) + " (" + target.boardIndex + ")";
+            return board.get(event.casterBoardIndex) + " (" + event.casterBoardIndex + ") killed " + board.get(target.boardIndex) + " (" + target.boardIndex + ")";
     }
 }
 var ViewModel = /** @class */ (function () {

@@ -18,6 +18,15 @@ type LogEvent = {
 	spellID: number,
 };
 
+enum FollowerRole {
+	None = 0,
+	Melee = 1,
+	RangedPhysical = 2,
+	RangedMagic = 3,
+	HealSupport = 4,
+	Tank = 5,
+}
+
 type MissionData = {
 	missionScalar: number,
 	log: [{
@@ -42,7 +51,7 @@ type MissionData = {
 				hasThornsEffect: boolean,
 				cooldown: number,
 			}],
-			role: number,
+			role: FollowerRole,
 			name: string,
 			boardIndex: number,
 			health: number,
@@ -81,8 +90,8 @@ type MissionData = {
 		attack: number,
 	}],
 	winner: boolean,
-	predictionCorrect: boolean,
-	differentOutcome: boolean,
+	predictionCorrect?: boolean,
+	differentOutcome?: boolean,
 	// calculated
 	board: Map<number, string>,
 	spell: Map<number, string>,
@@ -131,18 +140,18 @@ function formatEvent(event: LogEvent, target: TargetInfo, board: Map<number, str
 			return `${board.get(event.casterBoardIndex)} (${event.casterBoardIndex}) cast ${spell.get(event.spellID)} (${event.spellID}) at ${board.get(target.boardIndex)} (${target.boardIndex}) for ${target.points} ${spellSchoolName(event.schoolMask)} damage (${target.newHealth}/${target.maxHealth})`;
 		case EventType.SpellRangeDamage:
 			return `${board.get(event.casterBoardIndex)} (${event.casterBoardIndex}) cast ${spell.get(event.spellID)} (${event.spellID}) at ${board.get(target.boardIndex)} (${target.boardIndex}) for ${target.points} ${spellSchoolName(event.schoolMask)} damage (${target.newHealth}/${target.maxHealth})`;
+		case EventType.Heal:
+			return `${board.get(event.casterBoardIndex)} (${event.casterBoardIndex}) cast ${spell.get(event.spellID)} (${event.spellID}) on ${board.get(target.boardIndex)} (${target.boardIndex}) for ${target.points} healing (${target.newHealth}/${target.maxHealth})`;
 		case EventType.PeriodicDamage:
 			return `${board.get(event.casterBoardIndex)}'s (${event.casterBoardIndex}) ${spell.get(event.spellID)} (${event.spellID}) dealt ${target.points} ${spellSchoolName(event.schoolMask)} to ${board.get(target.boardIndex)} (${target.boardIndex}) (${target.newHealth}/${target.maxHealth})`;
+		case EventType.PeriodicHeal:
+			return `${board.get(event.casterBoardIndex)}'s (${event.casterBoardIndex}) ${spell.get(event.spellID)} (${event.spellID}) healed ${board.get(target.boardIndex)} (${target.boardIndex}) for ${target.points} (${target.newHealth}/${target.maxHealth})`;
 		case EventType.ApplyAura:
 			return `${board.get(event.casterBoardIndex)} (${event.casterBoardIndex}) applied ${spell.get(event.spellID)} (${event.spellID}) to ${board.get(target.boardIndex)} (${target.boardIndex})`;
 		case EventType.RemoveAura:
 			return `${board.get(event.casterBoardIndex)} (${event.casterBoardIndex}) removed ${spell.get(event.spellID)} (${event.spellID}) from ${board.get(target.boardIndex)} (${target.boardIndex})`;
-		case EventType.Heal:
-			return `${board.get(event.casterBoardIndex)} (${event.casterBoardIndex}) cast ${spell.get(event.spellID)} (${event.spellID}) on ${board.get(target.boardIndex)} (${target.boardIndex}) for ${target.points} healing (${target.newHealth}/${target.maxHealth})`;
-		case EventType.PeriodicHeal:
-			return `${board.get(event.casterBoardIndex)}'s (${event.casterBoardIndex}) ${spell.get(event.spellID)} (${event.spellID}) healed ${board.get(target.boardIndex)} (${target.boardIndex}) for ${target.points} (${target.newHealth}/${target.maxHealth})`;
 		case EventType.Died:
-			return `${board.get(event.casterBoardIndex)}'s (${event.casterBoardIndex}) killed ${board.get(target.boardIndex)} (${target.boardIndex})`;
+			return `${board.get(event.casterBoardIndex)} (${event.casterBoardIndex}) killed ${board.get(target.boardIndex)} (${target.boardIndex})`;
 	}
 }
 

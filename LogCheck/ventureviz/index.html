@@ -8,7 +8,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
 
-<body id="body" class="container-fluid">
+<body class="container-fluid">
 	<h1>Venture Viz</h1>
 	<h2>Mission Data</h2>
 	<textarea data-bind="textInput: input" cols="120" rows="5" placeholder="Paste the logs here."></textarea>
@@ -20,21 +20,20 @@
 			</li>
 		</ul>
 		<div data-bind="foreach: views">
-			<h3>
+			<h3 data-bind="css: { 'text-danger': !winner }">
 				<a data-bind="attr: { name: $index }"></a>
-				<span data-bind="text: missionName, css: { 'text-danger': !winner }"></span>
+				<span data-bind="text: missionName"></span>
 				(<span data-bind="text: missionID"></span>)
 			</h3>
 			<p>
-				<div>Addon Version: <span data-bind="text: addonVersion"></span></div>
+				<div>Addon version: <span data-bind="text: addonVersion"></span></div>
 				<div>Prediction correct: <span data-bind="text: predictionCorrect"></span></div>
 				<div>Different outcome: <span data-bind="text: differentOutcome"></span></div>
 			</p>
 			<h4>Encounters</h4>
 			<ul data-bind="foreach: encounters">
 				<li>
-					<span data-bind="text: name"></span>
-					(<span data-bind="text: boardIndex"></span>),
+					<span data-bind="text: name"></span> (<span data-bind="text: boardIndex"></span>),
 					Health <span data-bind="text: health"></span>/<span data-bind="text: maxHealth"></span>,
 					Attack <span data-bind="text: attack"></span>
 				</li>
@@ -42,8 +41,7 @@
 			<h4>Followers</h4>
 			<ul data-bind="foreach: Object.values($data.followers)">
 				<li>
-					<span data-bind="text: name"></span>
-					(<span data-bind="text: boardIndex"></span>),
+					<span data-bind="text: name"></span> (<span data-bind="text: boardIndex"></span>),
 					Level <span data-bind="text: level"></span>,
 					Health <span data-bind="text: health"></span>/<span data-bind="text: maxHealth"></span>,
 					Attack <span data-bind="text: attack"></span>
