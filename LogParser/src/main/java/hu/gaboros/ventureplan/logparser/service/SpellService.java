@@ -12,15 +12,16 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class SpellService {
 
+  private static final String EN_US = "enUS";
+
   private final SpellRepository spellRepository;
   private final SpellMapper spellMapper;
-  private final LanguageDetector languageDetector;
 
   public Long save(MissionReport missionReport) {
     Long numberOfNewSpells = 0L;
     for (Encounter encounter : missionReport.getEncounters()) {
       for (Spell spell : encounter.getSpells()) {
-        if (saveSpell(spell, encounter, true)) {
+        if (saveSpell(spell, encounter, true, missionReport.getMeta())) {
           numberOfNewSpells++;
         }
       }
@@ -28,7 +29,7 @@ public class SpellService {
 
     for (Follower follower : missionReport.getFollowers().values()) {
       for (Spell spell : follower.getSpells()) {
-        if (saveSpell(spell, follower, false)) {
+        if (saveSpell(spell, follower, false, missionReport.getMeta())) {
           numberOfNewSpells++;
         }
       }
@@ -36,7 +37,7 @@ public class SpellService {
     return numberOfNewSpells;
   }
 
-  private boolean saveSpell(Spell spell, Creature creature, boolean isEnemy) {
+  private boolean saveSpell(Spell spell, Creature creature, boolean isEnemy, Meta meta) {
     long id = HashUtil.createHash(spell.getName());
 
     boolean exists = spellRepository.existsById(id);
@@ -48,7 +49,7 @@ public class SpellService {
       entity.setCreatureRole(creature.getRole());
       entity.setCreatureName(creature.getName());
       entity.setCreatureAttack(creature.getAttack());
-      entity.setEnglish(languageDetector.isEnglish(spell.getDescription()));
+      entity.setEnglish(EN_US.equals(meta.getLanguage()));
       spellRepository.save(entity);
       return true;
     }

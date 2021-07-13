@@ -16,6 +16,7 @@ public class MissionReport {
   private Boolean differentOutcome;
   private String addonVersion = "5.1-beta";
   private String missionName;
+  private Meta meta;
 
   @JsonProperty(value = "missionID")
   private Long missionId;

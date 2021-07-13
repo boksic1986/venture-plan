@@ -12,9 +12,10 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class MissionService {
 
+  private static final String EN_US = "enUS";
+
   private final MissionRepository missionRepository;
   private final MissionReportMapper missionReportMapper;
-  private final LanguageDetector languageDetector;
 
   public boolean save(MissionReport missionReport, String content) {
     long id = HashUtil.createHash(content);
@@ -24,7 +25,7 @@ public class MissionService {
       MissionReportEntity entity = missionReportMapper.dtoToEntity(missionReport);
       entity.setId(id);
       entity.setLogContent(content);
-      entity.setEnglish(languageDetector.isEnglish(missionReport.getMissionName()));
+      entity.setEnglish(EN_US.equals(missionReport.getMeta().getLanguage()));
       // Before version 5.4-beta this variable was badly assumed.
       if (entity.getDifferentOutcome() == null) {
         entity.setDifferentOutcome(!entity.getPredictionCorrect());

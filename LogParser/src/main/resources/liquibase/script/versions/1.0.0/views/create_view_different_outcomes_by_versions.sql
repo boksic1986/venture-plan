@@ -1,4 +1,4 @@
-create view different_outcome_by_versions as
+create view different_outcomes_by_versions as
 select all_missions.addon_version,
        all_missions.count                                   as all_missions,
        different_outcome.count                              as different_outcome,
