@@ -484,7 +484,7 @@ local function Predictor_ShowResult(self, sim, incompleteModel, recoverUntil, re
 	local res = sim.res
 	local rngModel = res.hadDrops or (res.hadWins and res.hadLosses)
 	local inProgress = not res.isFinished and not rngModel
-	local oodBuild = GetBuildInfo() ~= "9.0.5"
+	local oodBuild = GetBuildInfo() ~= "9.1.0"
 	local hprefix = (oodBuild or incompleteModel) and "|TInterface/EncounterJournal/UI-EJ-WarningTextIcon:0|t " or ""
 	if inProgress then
 		hprefix = hprefix .. "|cffff3300" .. L"Preliminary:" .. "|r "
