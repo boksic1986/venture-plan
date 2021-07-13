@@ -38,6 +38,10 @@ public class SpellService {
   }
 
   private boolean saveSpell(Spell spell, Creature creature, boolean isEnemy, Meta meta) {
+    if (!EN_US.equals(meta.getLanguage())) {
+      return false;
+    }
+
     long id = HashUtil.createHash(spell.getName());
 
     boolean exists = spellRepository.existsById(id);
@@ -49,7 +53,6 @@ public class SpellService {
       entity.setCreatureRole(creature.getRole());
       entity.setCreatureName(creature.getName());
       entity.setCreatureAttack(creature.getAttack());
-      entity.setEnglish(EN_US.equals(meta.getLanguage()));
       spellRepository.save(entity);
       return true;
     }

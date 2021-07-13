@@ -23,5 +23,4 @@ public class SpellEntity {
   private String creatureName;
   private Long creatureAttack;
   private boolean isEnemy;
-  private boolean isEnglish;
 }

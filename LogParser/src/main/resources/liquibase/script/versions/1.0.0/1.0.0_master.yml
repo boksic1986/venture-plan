@@ -3,28 +3,13 @@ databaseChangeLog:
       file: ddl/create_mission_report.sql
       relativeToChangelogFile: true
   - include:
-      file: ddl/create_auto_attack_override.sql
-      relativeToChangelogFile: true
-  - include:
       file: ddl/create_spell.sql
       relativeToChangelogFile: true
   - include:
-      file: views/create_view_bad_predictions_by_missions.sql
+      file: views/create_view_bad_predictions.sql
       relativeToChangelogFile: true
   - include:
-      file: views/create_view_bad_predictions_by_versions.sql
-      relativeToChangelogFile: true
-  - include:
-      file: views/create_view_different_outcomes_by_missions.sql
-      relativeToChangelogFile: true
-  - include:
-      file: views/create_view_different_outcomes_by_versions.sql
-      relativeToChangelogFile: true
-  - include:
-      file: views/create_view_spells.sql
-      relativeToChangelogFile: true
-  - include:
-      file: views/create_view_bad_predictions_by_versions.sql
+      file: views/create_view_different_outcomes.sql
       relativeToChangelogFile: true
   - include:
       file: index/create_mission_report_index.sql

@@ -12,9 +12,9 @@ import lombok.Data;
 public class MissionReport {
 
   private Boolean winner;
-  private Boolean predictionCorrect = true;
+  private Boolean predictionCorrect;
   private Boolean differentOutcome;
-  private String addonVersion = "5.1-beta";
+  private String addonVersion;
   private String missionName;
   private Meta meta;
 
