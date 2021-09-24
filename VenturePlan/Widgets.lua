@@ -2063,7 +2063,7 @@ function Factory.FollowerList(parent)
 	t:SetText(COVENANT_MISSION_FOLLOWER_CATEGORY)
 	t:SetPoint("TOPLEFT", 12, -110)
 	s.companions = {}
-	for i=1,20 do
+	for i=1,24 do
 		t = CreateObject("FollowerListButton", f, false)
 		t:SetPoint("TOPLEFT", ((i-1)%4)*76+14, -math.floor((i-1)/4)*72-130)
 		s.companions[i] = t
